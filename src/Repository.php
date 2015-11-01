@@ -186,7 +186,7 @@ class Repository implements RepositoryInterface
      */
     public function createCriteria(array $filter = [])
     {
-        $criteria = new Criteria('tasks');
+        $criteria = new Criteria('Task');
 
         return $criteria;
     }

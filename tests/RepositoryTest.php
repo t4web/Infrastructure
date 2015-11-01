@@ -10,7 +10,7 @@ use T4webDomainInterface\EntityFactoryInterface;
 use T4webInfrastructure\Repository;
 use T4webInfrastructure\Mapper;
 use T4webInfrastructure\QueryBuilder;
-use T4webInfrastructure\Criteria;
+use T4webInfrastructure\Config;
 
 class Task implements EntityInterface
 {
@@ -111,7 +111,24 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
                 'type' => 'type',
             ],
             new EntityFactory('T4webDomainTest\Task', 'ArrayObject'));
-        $queryBuilder = new QueryBuilder('tasks');
+
+        $config = new Config(
+            [
+                'Task' => [
+                    'table' => 'tasks',
+                    'columnsAsAttributesMap' => [
+                        'id' => 'id',
+                        'projectId' => 'project_id',
+                        'name' => 'name',
+                        'assigneeId' => 'assignee_id',
+                        'status' => 'status',
+                        'type' => 'type',
+                    ],
+                ]
+            ]
+        );
+
+        $queryBuilder = new QueryBuilder($config);
 
         $em = new EventManager();
 

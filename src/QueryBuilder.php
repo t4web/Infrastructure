@@ -11,13 +11,13 @@ class QueryBuilder
 {
 
     /**
-     * @var string
+     * @var Config
      */
-    protected $tableName;
+    protected $config;
 
-    public function __construct($tableName)
+    public function __construct(Config $config)
     {
-        $this->tableName = $tableName;
+        $this->config = $config;
     }
 
     /**
@@ -27,7 +27,7 @@ class QueryBuilder
     public function getSelect(CriteriaInterface $criteria)
     {
         $select = new Select();
-        $select->from($this->tableName);
+        $select->from($this->config->getTable($criteria->getEntityName()));
         $this->buildPredicate($select, $criteria);
         $this->buildOrPredicate($select, $criteria);
         $this->buildOrder($select, $criteria);
@@ -56,7 +56,7 @@ class QueryBuilder
         foreach($criteria->getPredicate() as $predicate) {
             $method = $predicate['name'];
             unset($predicate['name']);
-            $predicate['attribute'] = $criteria->getEntityName() . "." . $predicate['attribute'];
+            $predicate['attribute'] = $this->config->getTable($criteria->getEntityName()) . "." . $predicate['attribute'];
             call_user_func_array([$where, $method], $predicate);
         }
 
@@ -73,9 +73,11 @@ class QueryBuilder
 
         foreach($criteria->getOr() as $orCriteria) {
             foreach($orCriteria->getPredicate() as $predicate) {
+                $table = $this->config->getTable($orCriteria->getEntityName());
+
                 $method = $predicate['name'];
                 unset($predicate['name']);
-                $predicate['attribute'] = $orCriteria->getEntityName() . "." . $predicate['attribute'];
+                $predicate['attribute'] = $table . "." . $predicate['attribute'];
                 call_user_func_array([$orWhere, $method], $predicate);
             }
         }
@@ -87,9 +89,11 @@ class QueryBuilder
     {
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getRelations() as $relation) {
+            $table = $this->config->getTable($relation->getEntityName());
+
             $select->join(
-                $relation->getEntityName(),
-                sprintf('%s.id = %s.user_id', $criteria->getEntityName(), $relation->getEntityName()),
+                $table,
+                $this->config->getRelationExpression($criteria->getEntityName(), $relation->getEntityName()),
                 []
             );
 
@@ -100,7 +104,7 @@ class QueryBuilder
             foreach($relation->getPredicate() as $predicate) {
                 $method = $predicate['name'];
                 unset($predicate['name']);
-                $predicate['attribute'] = $relation->getEntityName() . "." . $predicate['attribute'];
+                $predicate['attribute'] = $table . "." . $predicate['attribute'];
                 call_user_func_array([$select->where, $method], $predicate);
             }
 
@@ -117,7 +121,7 @@ class QueryBuilder
         $order = [];
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getOrder() as $order) {
-            $order = $criteria->getEntityName() . "." . $order;
+            $order = $this->config->getTable($criteria->getEntityName()) . "." . $order;
         }
 
         $select->order($order);
