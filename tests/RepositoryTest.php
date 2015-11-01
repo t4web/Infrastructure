@@ -133,6 +133,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $em = new EventManager();
 
         $this->repository = new Repository(
+            'Task',
             $tableGateway,
             $mapper,
             $queryBuilder,

@@ -15,6 +15,11 @@ use T4webInfrastructure\Event\EntityChangedEvent;
 class Repository implements RepositoryInterface
 {
     /**
+     * @var string
+     */
+    protected $entityName;
+
+    /**
      * @var TableGateway
      */
     protected $tableGateway;
@@ -30,12 +35,12 @@ class Repository implements RepositoryInterface
     protected $queryBuilder;
 
     /**
-     * @var IdentityMap
+     * @var ArrayObject
      */
     protected $identityMap;
 
     /**
-     * @var IdentityMap
+     * @var ArrayObject
      */
     protected $identityMapOriginal;
 
@@ -49,13 +54,22 @@ class Repository implements RepositoryInterface
      */
     protected $event;
 
+    /**
+     * @param string                $entityName
+     * @param TableGateway          $tableGateway
+     * @param Mapper                $mapper
+     * @param QueryBuilder          $queryBuilder
+     * @param EventManagerInterface $eventManager
+     */
     public function __construct(
+        $entityName,
         TableGateway $tableGateway,
         Mapper $mapper,
         QueryBuilder $queryBuilder,
         EventManagerInterface $eventManager
     )
     {
+        $this->entityName = $entityName;
         $this->tableGateway = $tableGateway;
         $this->mapper = $mapper;
         $this->queryBuilder = $queryBuilder;
@@ -186,7 +200,9 @@ class Repository implements RepositoryInterface
      */
     public function createCriteria(array $filter = [])
     {
-        $criteria = new Criteria('Task');
+        if (empty($filter)) {
+            $criteria = new Criteria($this->entityName);
+        }
 
         return $criteria;
     }
