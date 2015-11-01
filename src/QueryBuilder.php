@@ -53,10 +53,12 @@ class QueryBuilder
 
         $where = new Where();
 
+        $table = $this->config->getTable($criteria->getEntityName());
+
         foreach($criteria->getPredicate() as $predicate) {
             $method = $predicate['name'];
             unset($predicate['name']);
-            $predicate['attribute'] = $this->config->getTable($criteria->getEntityName()) . "." . $predicate['attribute'];
+            $predicate['attribute'] = $table . "." . $predicate['attribute'];
             call_user_func_array([$where, $method], $predicate);
         }
 
@@ -118,10 +120,12 @@ class QueryBuilder
             return;
         }
 
+        $table = $this->config->getTable($criteria->getEntityName());
+
         $order = [];
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getOrder() as $order) {
-            $order = $this->config->getTable($criteria->getEntityName()) . "." . $order;
+            $order = $table . "." . $order;
         }
 
         $select->order($order);
