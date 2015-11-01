@@ -141,6 +141,31 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testCreateCriteria()
+    {
+        $criteria = $this->repository->createCriteria();
+
+        $this->assertInstanceOf('T4webDomainInterface\Infrastructure\CriteriaInterface', $criteria);
+    }
+
+    public function testCreateCriteriaWithFilter()
+    {
+        $criteria = $this->repository->createCriteria(
+            [
+                'Task' => [
+                    'status equalTo' => 2,
+                    'dateCreate greaterThan' => '2015-10-30',
+                ],
+                'User' => [
+                    'status in' => [2, 3, 4],
+                    'name like' => 'gor'
+                ]
+            ]
+        );
+
+        $this->assertInstanceOf('T4webDomainInterface\Infrastructure\CriteriaInterface', $criteria);
+    }
+
     public function testFindRowExists()
     {
         $id = 2;
@@ -217,6 +242,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $rowsAffected);
     }
+
 /*
     public function testRemove()
     {

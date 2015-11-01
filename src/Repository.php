@@ -202,6 +202,8 @@ class Repository implements RepositoryInterface
     {
         if (empty($filter)) {
             $criteria = new Criteria($this->entityName);
+        } else {
+            $criteria = new Criteria($this->entityName);
         }
 
         return $criteria;
