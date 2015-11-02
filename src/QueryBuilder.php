@@ -100,27 +100,80 @@ class QueryBuilder
     {
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getRelations() as $relation) {
-            $table = $this->config->getTable($relation->getEntityName());
 
-            $select->join(
-                $table,
-                $this->config->getRelationExpression($criteria->getEntityName(), $relation->getEntityName()),
-                []
-            );
-
-            if (empty($relation->getPredicate())) {
-                comtinue;
+            if ($this->config->isRelationManyToMany($criteria->getEntityName(), $relation->getEntityName())) {
+                $this->buildManyToMany($select, $criteria->getEntityName(), $relation);
+            } else {
+                $this->buildOneToMany($select, $criteria->getEntityName(), $relation);
             }
-
-            foreach($relation->getPredicate() as $predicate) {
-                $method = $predicate['name'];
-                unset($predicate['name']);
-                $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
-                call_user_func_array([$select->where, $method], $predicate);
-            }
-
-            //$select->where->addPredicates($predicate, $combination);
         }
+    }
+
+    private function buildOneToMany(Select $select, $entityName, CriteriaInterface $relation)
+    {
+        $table = $this->config->getTable($relation->getEntityName());
+
+        $select->join(
+            $table,
+            $this->config->getRelationExpression($entityName, $relation->getEntityName()),
+            []
+        );
+
+        if (empty($relation->getPredicate())) {
+            comtinue;
+        }
+
+        foreach($relation->getPredicate() as $predicate) {
+            $method = $predicate['name'];
+            unset($predicate['name']);
+            $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
+            call_user_func_array([$select->where, $method], $predicate);
+        }
+
+        //$select->where->addPredicates($predicate, $combination);
+    }
+
+    /**
+     * SELECT `news`.*
+     * FROM `news`
+     *   INNER JOIN `news_tags_link` ON `news_tags_link`.`news_id` = `news`.`id`
+     *   INNER JOIN `tags` ON `news_tags_link`.`tag_id` = `tags`.`id`
+     *
+     * @param Select $select
+     * @param $entityName
+     * @param CriteriaInterface $relation
+     */
+    private function buildManyToMany(Select $select, $entityName, CriteriaInterface $relation)
+    {
+        list($linkTable, $mainField, $joinedField) = $this->config->getRelationManyToMany($entityName, $relation->getEntityName());
+
+        $mainTable = $this->config->getTable($entityName);
+        $joinedTable = $this->config->getTable($relation->getEntityName());
+
+        $select->join(
+            $linkTable,
+            "$linkTable.$mainField = $mainTable.id",
+            []
+        );
+
+        $select->join(
+            $joinedTable,
+            "$linkTable.$joinedField = $joinedTable.id",
+            []
+        );
+
+        if (empty($relation->getPredicate())) {
+            comtinue;
+        }
+
+        foreach($relation->getPredicate() as $predicate) {
+            $method = $predicate['name'];
+            unset($predicate['name']);
+            $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
+            call_user_func_array([$select->where, $method], $predicate);
+        }
+
+        //$select->where->addPredicates($predicate, $combination);
     }
 
     private function buildOrder(Select $select, CriteriaInterface $criteria)

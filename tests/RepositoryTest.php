@@ -153,12 +153,13 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $criteria = $this->repository->createCriteria(
             [
                 'Task' => [
-                    'status equalTo' => 2,
-                    'dateCreate greaterThan' => '2015-10-30',
+                    'status.equalTo' => 2,
+                    'status.or.equalTo' => 3,
+                    'dateCreate.greaterThan' => '2015-10-30',
                 ],
                 'User' => [
-                    'status in' => [2, 3, 4],
-                    'name like' => 'gor'
+                    'status.in' => [2, 3, 4],
+                    'name.like' => 'gor'
                 ]
             ]
         );

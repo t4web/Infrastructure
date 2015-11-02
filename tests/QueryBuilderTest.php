@@ -41,13 +41,20 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
                         'type' => 'type',
                     ],
                     'relations' => [
-                        'Photo' => 'photos.user_id = users.id',
+                        'Photo' => ['photos.user_id', 'users.id'],
+                        'Tag' => ['users_tags_link', 'user_id', 'tag_id'],
                     ],
                 ],
                 'Photo' => [
                     'table' => 'photos',
                     'columnsAsAttributesMap' => [
                         'status' => 'status'
+                    ]
+                ],
+                'Tag' => [
+                    'table' => 'tags',
+                    'columnsAsAttributesMap' => [
+                        'type' => 'type'
                     ]
                 ]
             ]
@@ -122,6 +129,35 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             . "INNER JOIN `photos` ON `photos`.`user_id` = `users`.`id` "
             . "WHERE `users`.`id` > '5' "
             . "AND `photos`.`status` IN ('2', '3') "
+            . "ORDER BY `users`.`id` ASC "
+            . "LIMIT '20'",
+            $sql
+        );
+    }
+
+    public function testRelationManyToManyGetSelect()
+    {
+        $qb = new QueryBuilder($this->config);
+
+        $criteria = new Criteria('User');
+        $criteria->greaterThan('id', 5);
+        $criteria->limit(20);
+        $criteria->order('id');
+        $criteria->relation('Tag')
+            ->equalTo('type', 2);
+
+        $select = $qb->getSelect($criteria);
+
+        $sql = $select->getSqlString($this->dbAdapter->getPlatform());
+
+        $this->assertInstanceOf('Zend\Db\Sql\Select', $select);
+        $this->assertEquals(
+            "SELECT `users`.* "
+            . "FROM `users` "
+            . "INNER JOIN `users_tags_link` ON `users_tags_link`.`user_id` = `users`.`id` "
+            . "INNER JOIN `tags` ON `users_tags_link`.`tag_id` = `tags`.`id` "
+            . "WHERE `users`.`id` > '5' "
+            . "AND `tags`.`type` = '2' "
             . "ORDER BY `users`.`id` ASC "
             . "LIMIT '20'",
             $sql

@@ -63,6 +63,68 @@ class Config
             );
         }
 
-        return $this->entityMap[$entityName]['relations'][$joinEntityName];
+        if (!isset($this->entityMap[$entityName]['relations'][$joinEntityName][0])
+            || !isset($this->entityMap[$entityName]['relations'][$joinEntityName][1])) {
+            throw new ConfigException(
+                sprintf(
+                    "entity_map for %s with relation %s must be array [field, joined-filed]",
+                    $entityName,
+                    $joinEntityName
+                )
+            );
+        }
+
+        return $this->entityMap[$entityName]['relations'][$joinEntityName][0] . ' = '
+            . $this->entityMap[$entityName]['relations'][$joinEntityName][1];
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $joinEntityName
+     * @return bool
+     */
+    public function isRelationManyToMany($entityName, $joinEntityName)
+    {
+        if (!isset($this->entityMap[$entityName]['relations'][$joinEntityName])) {
+            throw new ConfigException(
+                sprintf(
+                    "entity_map for %s not configured with relation %s",
+                    $entityName,
+                    $joinEntityName
+                )
+            );
+        }
+
+        if (!isset($this->entityMap[$entityName]['relations'][$joinEntityName][0])
+            || !isset($this->entityMap[$entityName]['relations'][$joinEntityName][1])
+            || !isset($this->entityMap[$entityName]['relations'][$joinEntityName][2])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $joinEntityName
+     * @return array
+     */
+    public function getRelationManyToMany($entityName, $joinEntityName)
+    {
+        if (!$this->isRelationManyToMany($entityName, $joinEntityName)) {
+            throw new ConfigException(
+                sprintf(
+                    "entity_map for %s with relation %s must be array [link-table, field, joined-filed]",
+                    $entityName,
+                    $joinEntityName
+                )
+            );
+        }
+
+        return [
+            $this->entityMap[$entityName]['relations'][$joinEntityName][0],
+            $this->entityMap[$entityName]['relations'][$joinEntityName][1],
+            $this->entityMap[$entityName]['relations'][$joinEntityName][2],
+        ];
     }
 }

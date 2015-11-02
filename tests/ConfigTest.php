@@ -31,8 +31,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'type' => 'type',
                 ],
                 'relations' => [
-                    'User' => 'tasks.assignee_id = user.id',
-                    'Project' => 'tasks.project_id = projects.id',
+                    'User' => ['tasks.assignee_id', 'user.id'],
+                    'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
                 ],
             ],
         ];
@@ -56,7 +56,22 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $joinOn = $this->config->getRelationExpression('Task', 'User');
 
-        $this->assertEquals($this->entityMap['Task']['relations']['User'], $joinOn);
+        $this->assertEquals('tasks.assignee_id = user.id', $joinOn);
+    }
+
+    public function testIsRelationManyToMany()
+    {
+        $this->assertFalse($this->config->isRelationManyToMany('Task', 'User'));
+        $this->assertTrue($this->config->isRelationManyToMany('Task', 'Tag'));
+    }
+
+    public function testGetRelationManyToMany()
+    {
+        list($linkTable, $joinOn1, $joinOn2) = $this->config->getRelationManyToMany('Task', 'Tag');
+
+        $this->assertEquals('tasks_tags_link', $linkTable);
+        $this->assertEquals('task_id', $joinOn1);
+        $this->assertEquals('tag_id', $joinOn2);
     }
 
 }
