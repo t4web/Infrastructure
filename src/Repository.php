@@ -20,6 +20,11 @@ class Repository implements RepositoryInterface
     protected $entityName;
 
     /**
+     * @var CriteriaFactory
+     */
+    protected $criteriaFactory;
+
+    /**
      * @var TableGateway
      */
     protected $tableGateway;
@@ -63,6 +68,7 @@ class Repository implements RepositoryInterface
      */
     public function __construct(
         $entityName,
+        CriteriaFactory $criteriaFactory,
         TableGateway $tableGateway,
         Mapper $mapper,
         QueryBuilder $queryBuilder,
@@ -70,6 +76,7 @@ class Repository implements RepositoryInterface
     )
     {
         $this->entityName = $entityName;
+        $this->criteriaFactory = $criteriaFactory;
         $this->tableGateway = $tableGateway;
         $this->mapper = $mapper;
         $this->queryBuilder = $queryBuilder;
@@ -203,7 +210,7 @@ class Repository implements RepositoryInterface
         if (empty($filter)) {
             $criteria = new Criteria($this->entityName);
         } else {
-            $criteria = new Criteria($this->entityName);
+            $criteria = $this->criteriaFactory->build($this->entityName, $filter);
         }
 
         return $criteria;

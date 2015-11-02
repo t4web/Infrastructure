@@ -2,6 +2,7 @@
 
 namespace T4webDomainTest;
 
+use T4webInfrastructure\CriteriaFactory;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 use Zend\EventManager\EventManager;
@@ -132,8 +133,11 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $em = new EventManager();
 
+        $criteriaFactory = new CriteriaFactory();
+
         $this->repository = new Repository(
             'Task',
+            $criteriaFactory,
             $tableGateway,
             $mapper,
             $queryBuilder,
@@ -152,14 +156,15 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
     {
         $criteria = $this->repository->createCriteria(
             [
-                'Task' => [
-                    'status.equalTo' => 2,
-                    'status.or.equalTo' => 3,
-                    'dateCreate.greaterThan' => '2015-10-30',
-                ],
-                'User' => [
-                    'status.in' => [2, 3, 4],
-                    'name.like' => 'gor'
+                'status.equalTo' => 2,
+                'status.or.equalTo' => 3,
+                'dateCreate.greaterThan' => '2015-10-30',
+
+                'relations' => [
+                    'User' => [
+                        'status.in' => [2, 3, 4],
+                        'name.like' => 'gor'
+                    ]
                 ]
             ]
         );
