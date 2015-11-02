@@ -29,6 +29,24 @@ class Config
 
     /**
      * @param string $entityName
+     * @param string $attribute
+     * @return string
+     */
+    public function getFiled($entityName, $attribute)
+    {
+        if (!isset($this->entityMap[$entityName]['columnsAsAttributesMap'])) {
+            throw new ConfigException(sprintf("entity_map[columnsAsAttributesMap] not configured for %s", $entityName));
+        }
+
+        if (!isset($this->entityMap[$entityName]['columnsAsAttributesMap'][$attribute])) {
+            throw new ConfigException(sprintf("attributes %s not exists in entity_map[columnsAsAttributesMap] config", $attribute));
+        }
+
+        return $this->entityMap[$entityName]['columnsAsAttributesMap'][$attribute];
+    }
+
+    /**
+     * @param string $entityName
      * @param string $joinEntityName
      *
      * @return string

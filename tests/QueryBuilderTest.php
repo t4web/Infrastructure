@@ -46,6 +46,9 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'Photo' => [
                     'table' => 'photos',
+                    'columnsAsAttributesMap' => [
+                        'status' => 'status'
+                    ]
                 ]
             ]
         );
@@ -58,7 +61,7 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
         $criteria = new Criteria('User');
         $criteria->equalTo('id', 2);
         $criteria->notEqualTo('id', 3);
-        $criteria->lessThan('id', 4);
+        $criteria->lessThan('projectId', 4);
         $criteria->greaterThan('id', 5);
         $criteria->greaterThanOrEqualTo('id', 6);
         $criteria->lessThanOrEqualTo('id', 7);
@@ -81,7 +84,7 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
             . "FROM `users` "
             . "WHERE `users`.`id` = '2' "
             . "AND `users`.`id` != '3' "
-            . "AND `users`.`id` < '4' "
+            . "AND `users`.`project_id` < '4' "
             . "AND `users`.`id` > '5' "
             . "AND `users`.`id` >= '6' "
             . "AND `users`.`id` <= '7' "
