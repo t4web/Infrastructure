@@ -14,3 +14,7 @@ mysql -u root -e 'CREATE TABLE IF NOT EXISTS `tasks` (
 `type` tinyint(1) NOT NULL,
 PRIMARY KEY (`id`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;'
+mysql -u root -e 'INSERT INTO `tasks` (`id`, `name`, `assignee`, `status`, `type`) VALUES
+(2, 'qq', 'qq', 1, 1),
+(3, '194556', '45', 0, 0),
+(4, 'Some name', 'AA', 0, 0);'
