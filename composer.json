@@ -14,6 +14,9 @@
   "require-dev" : {
     "phpunit/phpunit": "~4.5"
   },
+  "suggest": {
+    "t4web/domain": "DDD implementation"
+  },
   "autoload": {
     "psr-4": {
       "T4webInfrastructure\\": "src/",
