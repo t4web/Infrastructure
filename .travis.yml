@@ -18,6 +18,8 @@ install:
 
 before_script:
   - sudo pip install codecov
+  - composer self-update
+  - .ci/mysql_fixtures.sh
 
 script:
   - if [[ $EXECUTE_TEST_COVERALLS == 'true' ]]; then ./vendor/bin/phpunit --coverage-clover=coverage.xml ; fi
