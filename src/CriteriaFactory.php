@@ -24,6 +24,7 @@ class CriteriaFactory
             return $criteria;
         }
 
+        $relations = [];
         if (isset($filter['relations'])) {
             $relations = $filter['relations'];
             unset($filter['relations']);

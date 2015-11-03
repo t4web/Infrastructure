@@ -129,8 +129,6 @@ class QueryBuilder
             $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
             call_user_func_array([$select->where, $method], $predicate);
         }
-
-        //$select->where->addPredicates($predicate, $combination);
     }
 
     /**
@@ -172,8 +170,6 @@ class QueryBuilder
             $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
             call_user_func_array([$select->where, $method], $predicate);
         }
-
-        //$select->where->addPredicates($predicate, $combination);
     }
 
     private function buildOrder(Select $select, CriteriaInterface $criteria)

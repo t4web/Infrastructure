@@ -87,7 +87,7 @@ class Repository implements RepositoryInterface
 
     /**
      * @param EntityInterface $entity
-     * @return EntityInterface
+     * @return EntityInterface|int|null
      */
     public function add(EntityInterface $entity)
     {
@@ -253,11 +253,7 @@ class Repository implements RepositoryInterface
      */
     protected function triggerCreate(EntityInterface &$createdEntity)
     {
-        if (!empty($createdEntity) && $createdEntity instanceof Collection) {
-            $this->eventManager->addIdentifiers(get_class($createdEntity->getFirst()));
-        } else {
-            $this->eventManager->addIdentifiers(get_class($createdEntity));
-        }
+        $this->eventManager->addIdentifiers(get_class($createdEntity));
 
         $event = new Event(sprintf('entity:%s:created', get_class($createdEntity)), $this, ['entity' => $createdEntity]);
         $this->eventManager->trigger($event);

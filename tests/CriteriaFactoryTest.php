@@ -3,6 +3,7 @@
 namespace T4webInfrastructureTest;
 
 use T4webInfrastructure\CriteriaFactory;
+use Zend\Stdlib\ArrayObject;
 
 class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -53,6 +54,13 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
 
         $relations = $criteria->getRelations();
 
+        $a = new ArrayObject(['name' => 'greaterThan',
+                              'attribute' => 'dateCreate',
+                              'value' => '2015-10-30',]);
+
+        die(var_dump(key($a->getArrayCopy())));
+
+        $this->assertEquals('User', $relations[0]->getEntityName());
         $this->assertEquals(
             [
                 [
