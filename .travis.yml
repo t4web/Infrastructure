@@ -21,7 +21,15 @@ install:
 
 before_script:
   - sudo pip install codecov
-  - chmod +x .ci/mysql_fixtures.sh && .ci/mysql_fixtures.sh
+  #- chmod +x .ci/mysql_fixtures.sh && .ci/mysql_fixtures.sh
+  - sh -c "mysql -e 'CREATE TABLE board.tasks (
+   id int(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   name varchar(255) NOT NULL,
+   assignee varchar(2) NOT NULL,
+   status tinyint(1) NOT NULL,
+   type tinyint(1) NOT NULL
+   ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1;'"
+  - sh -c "mysql -e 'INSERT INTO board.tasks (id, name, assignee, status, type) VALUES (2, \'qq\', \'qq\', 1, 1), (3, \'194556\', \'45\', 0, 0), (4, \'Some name\', \'AA\', 0, 0);"
 
 script:
   - if [[ $EXECUTE_TEST_COVERALLS == 'true' ]]; then ./vendor/bin/phpunit --coverage-clover=coverage.xml ; fi
