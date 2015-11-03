@@ -22,8 +22,8 @@ install:
 before_script:
   - sudo pip install codecov
   #- chmod +x .ci/mysql_fixtures.sh && .ci/mysql_fixtures.sh
-  - echo "CREATE USER 'board'@'localhost' IDENTIFIED BY '111';" | mysql
-  - echo "GRANT ALL PRIVILEGES ON *.* TO 'board'@'localhost';" | mysql
+  - echo "CREATE USER 'board'@'localhost' IDENTIFIED BY '111';" | mysql -u root
+  - echo "GRANT ALL PRIVILEGES ON *.* TO 'board'@'localhost';" | mysql -u root
   - sh -c "mysql -e 'FLUSH PRIVILEGES;'"
   - sh -c "mysql -e 'CREATE DATABASE board;'"
   - sh -c "mysql -e 'CREATE TABLE board.tasks (
