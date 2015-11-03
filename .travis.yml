@@ -13,12 +13,14 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+before_install:
+  - composer self-update
+
 install:
   - composer install --no-interaction
 
 before_script:
   - sudo pip install codecov
-  - composer self-update
   - chmod +x .ci/mysql_fixtures.sh && .ci/mysql_fixtures.sh
 
 script:
