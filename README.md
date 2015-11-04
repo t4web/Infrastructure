@@ -13,6 +13,7 @@ Infrastructure layer for Domain, implementation by [t4web\domain-interface](http
 - [Installation](#instalation)
 - [Quick start](#quick-start)
 - [Components](#components)
+- [Configuring](#configuring)
 
 ## Installation
 
@@ -113,3 +114,41 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   //        INNER JOIN `photos` ON `photos`.`task_id` = `tasks`.`id`
   //        WHERE `tasks`.id = 2 AND `photos`.`status` = 3
   ```
+
+## Configuring
+
+For configuring `Repository` you must specify config, and use `Config` object for parsing config. `QueryBuilder` 
+use `Config` for building SQL query.
+
+```php
+$entityMapConfig = [
+    // Entity name
+    'Task' => [
+        
+        // table name
+        'table' => 'tasks',
+        
+        // map for entity attribute <=> table fields
+        'columnsAsAttributesMap' => [
+            
+            // attribute => table field
+            'id' => 'id',
+            'projectId' => 'project_id',
+            'name' => 'name',
+            'assigneeId' => 'assignee_id',
+            'status' => 'status',
+            'type' => 'type',
+        ],
+        
+        // foreign relation
+        'relations' => [
+        
+            // relation entity name + table.field for building JOIN
+            'User' => ['tasks.assignee_id', 'user.id'],
+            
+            // relation entity name + table.field for building JOIN
+            'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
+        ],
+    ],
+]
+```
