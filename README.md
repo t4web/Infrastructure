@@ -40,7 +40,7 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
 
 - `Criteria` - for creating fetch expression
   ```php
-  $criteria = new Criteria('Task');
+  $criteria = new T4webInfrastructure\Criteria('Task');
   $criteria->equalTo('id', 2);
   $criteria->in('type', [1,2,3]);
   $criteria->limit(20);
@@ -67,4 +67,49 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
           ]
       ]
   );
+  ```
+  
+- `Mapper` - for translate `Entity` to table row (array), and table row to `Entity`
+  ```php
+  $columnsAsAttributesMap = [
+      'id' => 'id',
+      'projectId' => 'project_id',
+      'name' => 'name',
+      'assigneeId' => 'assignee_id',
+      'status' => 'status',
+      'type' => 'type',
+  ];
+  $tableRow = [
+      'id' => 22,
+      'project_id' => 33,
+      'name' => 'Some name',
+      'assignee_id' => 44,
+      'status' => 2,
+      'type' => 1,
+  ];
+  $mapper = new T4webInfrastructure\Mapper($columnsAsAttributesMap, new T4webDomainInterface\EntityFactoryInterface());
+  $entity = $mapper->fromTableRow($tableRow);
+  $tableRow = $mapper->toTableRow($entity);
+  ```
+
+- `QueryBuilder` - for build SQL query
+  ```php
+  $queryBuilder = new T4webInfrastructure\QueryBuilder();
+  
+  $criteria = new T4webInfrastructure\Criteria('Task');
+  $criteria->equalTo('id', 2);
+  $criteria->relation('Photos')
+      ->equalTo('status', 3);
+      
+  /** @var Zend\Db\Sql\Select $select */
+  $select = $queryBuilder->getSelect($criteria);
+  
+  $tableGateway = new Zend\Db\TableGateway\TableGateway('tasks', $dbAdapter);
+  $rows = $this->tableGateway->selectWith($select);
+  
+  $sql = $select->getSqlString($this->dbAdapter->getPlatform());
+  // $sql = SELECT `tasks`.*
+  //        FROM `tasks`
+  //        INNER JOIN `photos` ON `photos`.`task_id` = `tasks`.`id`
+  //        WHERE `tasks`.id = 2 AND `photos`.`status` = 3
   ```
