@@ -5,6 +5,7 @@ Master:
 [![codecov.io](http://codecov.io/github/t4web/Infrastructure/coverage.svg?branch=master)](http://codecov.io/github/t4web/Infrastructure?branch=master)
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/t4web/Infrastructure/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/t4web/Infrastructure/?branch=master)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/973ae246-c9a7-4a93-b84b-24fbcafd3cda/mini.png)](https://insight.sensiolabs.com/projects/973ae246-c9a7-4a93-b84b-24fbcafd3cda)
+[![Dependency Status](https://www.versioneye.com/user/projects/5639f8af1d47d400190001a6/badge.svg?style=flat)](https://www.versioneye.com/user/projects/5639f8af1d47d400190001a6)
 
 Infrastructure layer for Domain, implementation by [t4web\domain-interface](https://github.com/t4web/DomainInterface)
 
