@@ -12,6 +12,7 @@ Infrastructure layer for Domain, implementation by [t4web\domain-interface](http
 ## Contents
 - [Installation](#instalation)
 - [Quick start](#quick-start)
+- [Components](#components)
 
 ## Installation
 
@@ -31,4 +32,39 @@ $ php composer.phar update
 
 ## Quick start
 
-You can use `Repository` with Domain implementation [t4web\domain](https://github.com/t4web/Domain)
+You can use `Repository` with Domain implementation [t4web\domain](https://github.com/t4web/Domain).
+This implementation build on [Zend\Db](https://github.com/zendframework/zend-db) and 
+[Zend\EventManager](https://github.com/zendframework/zend-eventmanager)
+
+## Components
+
+- `Criteria` - for creating fetch expression
+  ``php
+  $criteria = new Criteria('Task');
+  $criteria->equalTo('id', 2);
+  $criteria->in('type', [1,2,3]);
+  $criteria->limit(20);
+  $criteria->offset(10);
+  $criteria->relation('Photos')
+      ->equalTo('status', 3)
+      ->greaterThan('created_dt', '2015-10-30');
+  ``
+
+- `CriteriaFactory` - for creating complex criteria from array
+  ``php
+  $criteriaFactory = new T4webInfrastructure\CriteriaFactory();
+  $criteria = $criteriaFactory->build(
+      'Task',
+      [
+          'status.equalTo' => 2,
+          'dateCreate.greaterThan' => '2015-10-30',
+
+          'relations' => [
+              'User' => [
+                  'status.in' => [2, 3, 4],
+                  'name.like' => 'gor'
+              ]
+          ]
+      ]
+  );
+  ``
