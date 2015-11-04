@@ -14,6 +14,7 @@ Infrastructure layer for Domain, implementation by [t4web\domain-interface](http
 - [Quick start](#quick-start)
 - [Components](#components)
 - [Configuring](#configuring)
+- [Events](#events)
 
 ## Installation
 
@@ -152,3 +153,29 @@ $entityMapConfig = [
     ],
 ]
 ```
+
+## Events
+
+`Repository` rise events when entity created or updated.
+```php
+$eventManager = new EventManager();
+$eventManager->getSharedManager()->attach(
+     'T4webInfrastructure\Repository',
+     ''entity:ModuleName\EntityName\EntityName:changed'',
+     function(T4webInfrastructure\Event\EntityChangedEvent $e){
+        $changedEntity = $e->getChangedEntity();
+        $originalEntity = $e->getOriginalEntity();
+        // ...
+     },
+     $priority
+);
+```
+Now `Repository` can rise:
+- `entity:ModuleName\EntityName\EntityName:created` - rise after Entity just created in DB.
+  In context event subscriber receive Zend\EventManager\Event.
+- `entity:ModuleName\EntityName\EntityName:changed:pre` - rise before Entity update in DB.
+  In context event subscriber receive T4webInfrastructure\Event\EntityChangedEvent.
+- `entity:ModuleName\EntityName\EntityName:changed` - rise after Entity just updated in DB.
+  In context event subscriber receive T4webInfrastructure\Event\EntityChangedEvent.
+- `attribute:ModuleName\EntityName\EntityName:attribute:changed` - rise after Entity attribute updated in DB.
+  In context event subscriber receive T4webInfrastructure\Event\EntityChangedEvent.
