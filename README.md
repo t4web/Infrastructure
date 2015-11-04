@@ -39,7 +39,7 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
 ## Components
 
 - `Criteria` - for creating fetch expression
-  ``php
+  ```php
   $criteria = new Criteria('Task');
   $criteria->equalTo('id', 2);
   $criteria->in('type', [1,2,3]);
@@ -48,10 +48,10 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   $criteria->relation('Photos')
       ->equalTo('status', 3)
       ->greaterThan('created_dt', '2015-10-30');
-  ``
+  ```
 
 - `CriteriaFactory` - for creating complex criteria from array
-  ``php
+  ```php
   $criteriaFactory = new T4webInfrastructure\CriteriaFactory();
   $criteria = $criteriaFactory->build(
       'Task',
@@ -67,4 +67,4 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
           ]
       ]
   );
-  ``
+  ```
