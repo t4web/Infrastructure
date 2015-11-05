@@ -195,6 +195,24 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($entity);
     }
 
+    public function testFindByIdRowExists()
+    {
+        $id = 2;
+
+        $entity = $this->repository->findById($id);
+
+        $this->assertInstanceOf('T4webDomainTest\Task', $entity);
+        $this->assertEquals($id, $entity->getId());
+    }
+
+    public function testFindByIdRowNotExists()
+    {
+        $id = 1;
+        $entity = $this->repository->findById($id);
+
+        $this->assertNull($entity);
+    }
+
     public function testCount()
     {
         $id = 2;

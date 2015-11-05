@@ -61,6 +61,7 @@ class Repository implements RepositoryInterface
 
     /**
      * @param string                $entityName
+     * @param CriteriaFactory       $criteriaFactory
      * @param TableGateway          $tableGateway
      * @param Mapper                $mapper
      * @param QueryBuilder          $queryBuilder
@@ -162,6 +163,18 @@ class Repository implements RepositoryInterface
         $this->toIdentityMap($entity);
 
         return $entity;
+    }
+
+    /**
+     * @param mixed $id
+     * @return EntityInterface|null
+     */
+    public function findById($id)
+    {
+        $criteria = $this->createCriteria();
+        $criteria->equalTo('id', $id);
+
+        return $this->find($criteria);
     }
 
     /**
