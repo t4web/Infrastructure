@@ -127,4 +127,26 @@ class Config
             $this->entityMap[$entityName]['relations'][$joinEntityName][2],
         ];
     }
+
+    /**
+     * @param string $entityName
+     *
+     * @return array
+     */
+    public function getColumnsAsAttributesMap($entityName)
+    {
+        if (!isset($this->entityMap[$entityName]['columnsAsAttributesMap'])) {
+            throw new ConfigException(
+                sprintf("entity_map[columnsAsAttributesMap] not configured for %s", $entityName)
+            );
+        }
+
+        if (!is_array($this->entityMap[$entityName]['columnsAsAttributesMap'])) {
+            throw new ConfigException(
+                sprintf("entity_map[columnsAsAttributesMap] for %s must be array", $entityName)
+            );
+        }
+
+        return $this->entityMap[$entityName]['columnsAsAttributesMap'];
+    }
 }

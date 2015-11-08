@@ -74,4 +74,10 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('tag_id', $joinOn2);
     }
 
+    public function testGetColumnsAsAttributesMap()
+    {
+        $columnsMap = $this->config->getColumnsAsAttributesMap('Task');
+
+        $this->assertEquals($this->entityMap['Task']['columnsAsAttributesMap'], $columnsMap);
+    }
 }
