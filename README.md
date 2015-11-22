@@ -13,6 +13,7 @@ Infrastructure layer for Domain, implementation by [t4web\domain-interface](http
 - [Installation](#instalation)
 - [Quick start](#quick-start)
 - [Components](#components)
+- [Build criteria from array](#build-criteria-from-array)
 - [Configuring](#configuring)
 - [Events](#events)
 
@@ -115,6 +116,86 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   //        INNER JOIN `photos` ON `photos`.`task_id` = `tasks`.`id`
   //        WHERE `tasks`.id = 2 AND `photos`.`status` = 3
   ```
+
+## Build criteria from array
+
+You can use `CriteriaFactory::build()` for building criteria from array (for example: 
+from input filter, post\get request)
+
+```php
+$inputData = $_GET;
+
+$criteriaFactory = new T4webInfrastructure\CriteriaFactory();
+$criteria = $criteriaFactory->build(
+    'Task',
+    $inputData
+);
+```
+
+`$inputData` must be structured like this:
+
+```php
+$inputData = [
+     'status.equalTo' => 2,
+     'dateCreate.greaterThan' => '2015-10-30',
+     // ...
+     'ATTRIBUTE.METHOD' => VALUE
+ ]
+```
+
+where `ATTRIBUTE` - criteria field, `METHOD` - one of `equalTo`, `notEqualTo`, `lessThan`,
+`greaterThan`, `greaterThanOrEqualTo`, `lessThanOrEqualTo`, `like`, `in`
+
+for `isNull`, `isNotNull` use
+ 
+```php
+$inputData = [
+  'ATTRIBUTE.isNull' => TRUE_EXPRESSION,
+  'ATTRIBUTE.isNotNull' => TRUE_EXPRESSION,
+  
+  // example
+  'status.isNull' => true,
+  'dateCreate.isNotNull' => 1,
+]
+```
+ 
+where `TRUE_EXPRESSION` can be any true expression: `true`, `1`, `'a'` etc.
+ 
+for `between` use array as value
+ 
+```php
+$inputData = [
+   'ATTRIBUTE.between' => [MIN_VALUE, MAX_VALUE],
+   
+   // example
+   'dateCreate.between' => ['2015-10-01', '2015-11-01'],
+]
+```
+  
+for `limit`, `offset` use 
+
+```php
+$inputData = [
+   'limit' => VALUE,
+   'offset' => VALUE,
+   
+   // example
+   'limit' => 20,
+   'offset' => 10,
+]
+```
+
+for `order` use SQL-like order expression
+
+```php
+$inputData = [
+   'order' => EXPRESSION,
+   
+   // example
+   'order' => 'dateCreate DESC',
+   'order' => 'dateCreate DESC, status ASC',
+]
+```
 
 ## Configuring
 

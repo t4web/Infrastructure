@@ -57,6 +57,34 @@ class CriteriaFactory
 
             list($attribute, $method) = $expressionArray;
 
+            if (in_array($method, ['isNull', 'isNotNull']) && $value) {
+                $criteria->{$method}($attribute);
+                continue;
+            }
+
+            if ($method == 'between') {
+                if (!is_array($value) || !isset($value[0]) || !isset($value[1])) {
+                    throw new RuntimeException(sprintf('Predicate %s must contain array [MIN_VALUE, MAX_VALUE], ', $method));
+                }
+
+                $criteria->between($value[0], $value[1]);
+                continue;
+            }
+
+            if (in_array($method, ['limit', 'offset'])) {
+                if (!is_integer($value) || $value < 0) {
+                    throw new RuntimeException(sprintf('Predicate %s must unsigned int, %s given', $method, $value));
+                }
+
+                $criteria->{$method}($value);
+                continue;
+            }
+
+            if ($method == 'order') {
+                $criteria->order($value);
+                continue;
+            }
+
             if (!method_exists($criteria, $method)) {
                 throw new RuntimeException(sprintf('Predicate %s does not exists', $method));
             }
