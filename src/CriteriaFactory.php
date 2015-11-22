@@ -67,7 +67,7 @@ class CriteriaFactory
                     throw new RuntimeException(sprintf('Predicate %s must contain array [MIN_VALUE, MAX_VALUE], ', $method));
                 }
 
-                $criteria->between($value[0], $value[1]);
+                $criteria->between($attribute, $value[0], $value[1]);
                 continue;
             }
 
