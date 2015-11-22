@@ -49,6 +49,21 @@ class CriteriaFactory
     private function applyFilter(CriteriaInterface $criteria, array $filter)
     {
         foreach($filter as $expressionString => $value) {
+
+            if (in_array($expressionString, ['limit', 'offset'])) {
+                if (!is_integer($value) || $value < 0) {
+                    throw new RuntimeException(sprintf('Predicate %s must unsigned int, %s given', $expressionString, $value));
+                }
+
+                $criteria->{$expressionString}($value);
+                continue;
+            }
+
+            if ($expressionString == 'order') {
+                $criteria->order($value);
+                continue;
+            }
+
             $expressionArray = explode('.', $expressionString);
 
             if (count($expressionArray) > 2) {
@@ -68,20 +83,6 @@ class CriteriaFactory
                 }
 
                 $criteria->between($attribute, $value[0], $value[1]);
-                continue;
-            }
-
-            if (in_array($method, ['limit', 'offset'])) {
-                if (!is_integer($value) || $value < 0) {
-                    throw new RuntimeException(sprintf('Predicate %s must unsigned int, %s given', $method, $value));
-                }
-
-                $criteria->{$method}($value);
-                continue;
-            }
-
-            if ($method == 'order') {
-                $criteria->order($value);
                 continue;
             }
 
