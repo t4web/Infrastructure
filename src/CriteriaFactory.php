@@ -51,11 +51,20 @@ class CriteriaFactory
         foreach($filter as $expressionString => $value) {
 
             if (in_array($expressionString, ['limit', 'offset'])) {
-                if (!is_integer($value) || $value < 0) {
+                $value = (int)$value;
+                if ($value < 0) {
                     throw new RuntimeException(sprintf('Predicate %s must unsigned int, %s given', $expressionString, $value));
                 }
 
                 $criteria->{$expressionString}($value);
+                continue;
+            }
+
+            if ($expressionString == 'page') {
+                if (!isset($filter['limit'])) {
+                    throw new RuntimeException(sprintf('Predicate %s require limit', $expressionString));
+                }
+                $criteria->offset($filter['limit'] * ($value - 1));
                 continue;
             }
 
