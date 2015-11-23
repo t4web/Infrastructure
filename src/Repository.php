@@ -205,6 +205,9 @@ class Repository implements RepositoryInterface
         $select = $this->queryBuilder->getSelect($criteria);
         $select->columns(["row_count" => new Expression("COUNT(*)")]);
 
+        $select->reset('limit');
+        $select->reset('offset');
+
         $result = $this->tableGateway->selectWith($select)->toArray();
 
         if (!isset($result[0])) {
