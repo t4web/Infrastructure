@@ -73,7 +73,7 @@ class CriteriaFactory
                 continue;
             }
 
-            if (strpos('.', $expressionString)) {
+            if (strpos($expressionString, '.') !== false) {
                 $expressionArray = explode('.', $expressionString);
             } else {
                 $expressionArray = explode('_', $expressionString);
