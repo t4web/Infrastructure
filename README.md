@@ -76,9 +76,9 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   ```php
   $columnsAsAttributesMap = [
       'id' => 'id',
-      'projectId' => 'project_id',
+      'project_id' => 'projectId',
       'name' => 'name',
-      'assigneeId' => 'assignee_id',
+      'assignee_id' => 'assigneeId',
       'status' => 'status',
       'type' => 'type',
   ];
@@ -215,9 +215,9 @@ $entityMapConfig = [
             
             // attribute => table field
             'id' => 'id',
-            'projectId' => 'project_id',
+            'project_id' => 'projectId',
             'name' => 'name',
-            'assigneeId' => 'assignee_id',
+            'assignee_id' => 'assigneeId',
             'status' => 'status',
             'type' => 'type',
         ],

@@ -38,11 +38,13 @@ class Config
             throw new ConfigException(sprintf("entity_map[columnsAsAttributesMap] not configured for %s", $entityName));
         }
 
-        if (!isset($this->entityMap[$entityName]['columnsAsAttributesMap'][$attribute])) {
+        $field = array_search($attribute, $this->entityMap[$entityName]['columnsAsAttributesMap']);
+
+        if (!$field) {
             throw new ConfigException(sprintf("attributes %s not exists in entity_map[columnsAsAttributesMap] config", $attribute));
         }
 
-        return $this->entityMap[$entityName]['columnsAsAttributesMap'][$attribute];
+        return $field;
     }
 
     /**

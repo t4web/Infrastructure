@@ -34,9 +34,9 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
                     'table' => 'users',
                     'columnsAsAttributesMap' => [
                         'id' => 'id',
-                        'projectId' => 'project_id',
+                        'project_id' => 'projectId',
                         'name' => 'name',
-                        'assigneeId' => 'assignee_id',
+                        'assignee_id' => 'assigneeId',
                         'status' => 'status',
                         'type' => 'type',
                     ],
