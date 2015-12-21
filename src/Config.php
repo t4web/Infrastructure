@@ -76,7 +76,7 @@ class Config
             );
         }
 
-        return $this->entityMap[$entityName]['relations'][$joinEntityName][0] . ' = '
+        return $this->entityMap[$entityName]['relations'][$joinEntityName][0].' = '
             . $this->entityMap[$entityName]['relations'][$joinEntityName][1];
     }
 

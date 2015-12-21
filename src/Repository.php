@@ -267,7 +267,7 @@ class Repository implements RepositoryInterface
     /**
      * @param EntityInterface $createdEntity
      */
-    protected function triggerCreate(EntityInterface &$createdEntity)
+    protected function triggerCreate(EntityInterface&$createdEntity)
     {
         $this->eventManager->addIdentifiers(get_class($createdEntity));
 
@@ -294,7 +294,7 @@ class Repository implements RepositoryInterface
     protected function triggerPreChanges(EntityChangedEvent $e)
     {
         $changedEntity = $e->getChangedEntity();
-        $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity) . ':pre', $this, $e);
+        $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity).':pre', $this, $e);
     }
 
     /**
