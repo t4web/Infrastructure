@@ -53,7 +53,7 @@ class QueryBuilder
 
         $where = new Where();
 
-        foreach($criteria->getPredicate() as $predicate) {
+        foreach ($criteria->getPredicate() as $predicate) {
             $method = $predicate['name'];
             unset($predicate['name']);
             $predicate['attribute'] = $this->getField($criteria->getEntityName(), $predicate['attribute']);
@@ -73,7 +73,7 @@ class QueryBuilder
         $table = $this->config->getTable($entityname);
         $field = $this->config->getFiled($entityname, $attribute);
 
-        return $table . "." . $field;
+        return $table.".".$field;
     }
 
     private function buildOrPredicate(Select $select, CriteriaInterface $criteria)
@@ -84,8 +84,8 @@ class QueryBuilder
 
         $orWhere = new Predicate();
 
-        foreach($criteria->getOr() as $orCriteria) {
-            foreach($orCriteria->getPredicate() as $predicate) {
+        foreach ($criteria->getOr() as $orCriteria) {
+            foreach ($orCriteria->getPredicate() as $predicate) {
                 $method = $predicate['name'];
                 unset($predicate['name']);
                 $predicate['attribute'] = $this->getField($orCriteria->getEntityName(), $predicate['attribute']);
@@ -123,7 +123,7 @@ class QueryBuilder
             return;
         }
 
-        foreach($relation->getPredicate() as $predicate) {
+        foreach ($relation->getPredicate() as $predicate) {
             $method = $predicate['name'];
             unset($predicate['name']);
             $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
@@ -164,7 +164,7 @@ class QueryBuilder
             return;
         }
 
-        foreach($relation->getPredicate() as $predicate) {
+        foreach ($relation->getPredicate() as $predicate) {
             $method = $predicate['name'];
             unset($predicate['name']);
             $predicate['attribute'] = $this->getField($relation->getEntityName(), $predicate['attribute']);
@@ -183,7 +183,7 @@ class QueryBuilder
         $order = [];
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getOrder() as $order) {
-            $order = $table . "." . $order;
+            $order = $table.".".$order;
         }
 
         $select->order($order);
