@@ -120,7 +120,7 @@ class QueryBuilder
         );
 
         if (empty($relation->getPredicate())) {
-            comtinue;
+            return;
         }
 
         foreach($relation->getPredicate() as $predicate) {
@@ -161,7 +161,7 @@ class QueryBuilder
         );
 
         if (empty($relation->getPredicate())) {
-            comtinue;
+            return;
         }
 
         foreach($relation->getPredicate() as $predicate) {
@@ -178,10 +178,12 @@ class QueryBuilder
             return;
         }
 
+        $table = $this->config->getTable($criteria->getEntityName());
+
         $order = [];
         /** @var CriteriaInterface $relation */
         foreach ($criteria->getOrder() as $order) {
-            $order = $this->getField($criteria->getEntityName(), $order);
+            $order = $table . "." . $order;
         }
 
         $select->order($order);
