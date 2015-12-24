@@ -307,7 +307,7 @@ class Repository implements RepositoryInterface
         $originalAttrs = $e->getOriginalEntity()->extract();
         $changedAttrs = $changedEntity->extract();
 
-        foreach (array_keys(array_diff($originalAttrs, $changedAttrs)) as $attribute) {
+        foreach (array_keys(array_diff_assoc($originalAttrs, $changedAttrs)) as $attribute) {
             $this->eventManager->trigger($this->getAttributeChangeEventName($changedEntity, $attribute), $this, $e);
         }
     }
