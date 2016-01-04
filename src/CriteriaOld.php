@@ -3,9 +3,7 @@
 namespace T4webInfrastructure;
 
 use T4webDomainInterface\Infrastructure\CriteriaInterface;
-use Zend\Db\Sql\Select;
-use Zend\Db\Sql\Where;
-use Zend\Db\Sql\Predicate\Predicate;
+
 
 class Criteria implements CriteriaInterface
 {
@@ -50,28 +48,11 @@ class Criteria implements CriteriaInterface
     protected $order = [];
 
     /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
      * @param string $entityName
      */
-    public function __construct($entityName, Config $config, Select $select = null)
+    public function __construct($entityName)
     {
         $this->entityName = $entityName;
-        $this->config = $config;
-        if (!$select) {
-            $this->sqlSelect = new Select();
-            $this->sqlSelect->from($this->config->getTable($this->entityName));
-        }
-    }
-
-    /**
-     * @return Select
-     */
-    public function getSelect() {
-        return $this->sqlSelect;
     }
 
     /**
@@ -89,10 +70,11 @@ class Criteria implements CriteriaInterface
      */
     public function equalTo($attribute, $value)
     {
-        $where = new Where();
-        $where->equalTo($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'equalTo',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -104,10 +86,11 @@ class Criteria implements CriteriaInterface
      */
     public function notEqualTo($attribute, $value)
     {
-        $where = new Where();
-        $where->notEqualTo($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'notEqualTo',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -119,10 +102,11 @@ class Criteria implements CriteriaInterface
      */
     public function lessThan($attribute, $value)
     {
-        $where = new Where();
-        $where->lessThan($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'lessThan',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -134,10 +118,11 @@ class Criteria implements CriteriaInterface
      */
     public function greaterThan($attribute, $value)
     {
-        $where = new Where();
-        $where->greaterThan($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'greaterThan',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -149,10 +134,11 @@ class Criteria implements CriteriaInterface
      */
     public function greaterThanOrEqualTo($attribute, $value)
     {
-        $where = new Where();
-        $where->greaterThanOrEqualTo($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'greaterThanOrEqualTo',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -164,10 +150,11 @@ class Criteria implements CriteriaInterface
      */
     public function lessThanOrEqualTo($attribute, $value)
     {
-        $where = new Where();
-        $where->lessThanOrEqualTo($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'lessThanOrEqualTo',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -179,10 +166,11 @@ class Criteria implements CriteriaInterface
      */
     public function like($attribute, $value)
     {
-        $where = new Where();
-        $where->like($this->getField($attribute), $value);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'like',
+            'attribute' => $attribute,
+            'value' => $value,
+        ];
 
         return $this;
     }
@@ -193,10 +181,10 @@ class Criteria implements CriteriaInterface
      */
     public function isNull($attribute)
     {
-        $where = new Where();
-        $where->isNull($this->getField($attribute));
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'isNull',
+            'attribute' => $attribute,
+        ];
 
         return $this;
     }
@@ -207,10 +195,10 @@ class Criteria implements CriteriaInterface
      */
     public function isNotNull($attribute)
     {
-        $where = new Where();
-        $where->isNotNull($this->getField($attribute));
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'isNotNull',
+            'attribute' => $attribute,
+        ];
 
         return $this;
     }
@@ -222,10 +210,11 @@ class Criteria implements CriteriaInterface
      */
     public function in($attribute, array $values)
     {
-        $where = new Where();
-        $where->in($this->getField($attribute), $values);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'in',
+            'attribute' => $attribute,
+            'values' => $values,
+        ];
 
         return $this;
     }
@@ -238,10 +227,12 @@ class Criteria implements CriteriaInterface
      */
     public function between($attribute, $minValue, $maxValue)
     {
-        $where = new Where();
-        $where->between($this->getField($attribute), $minValue, $maxValue);
-
-        $this->sqlSelect->where($where);
+        $this->predicate[] = [
+            'name' => 'between',
+            'attribute' => $attribute,
+            'minValue' => $minValue,
+            'maxValue' => $maxValue,
+        ];
 
         return $this;
     }
@@ -252,7 +243,7 @@ class Criteria implements CriteriaInterface
      */
     public function order($attribute)
     {
-        $this->sqlSelect->order($attribute);
+        $this->order[] = $attribute;
 
         return $this;
     }
@@ -263,7 +254,7 @@ class Criteria implements CriteriaInterface
      */
     public function limit($limit)
     {
-        $this->sqlSelect->limit($limit);
+        $this->limit = $limit;
 
         return $this;
     }
@@ -274,7 +265,7 @@ class Criteria implements CriteriaInterface
      */
     public function offset($offset)
     {
-        $this->sqlSelect->offset($offset);
+        $this->offset = $offset;
 
         return $this;
     }
@@ -285,21 +276,9 @@ class Criteria implements CriteriaInterface
      */
     public function relation($entityName)
     {
-        if ($this->config->isRelationManyToMany($this->entityName, $entityName)) {
-            //$this->buildManyToMany($select, $criteria->getEntityName(), $relation);
-        } else {
-            $table = $this->config->getTable($entityName);
-
-
-            $this->sqlSelect->join(
-                $table,
-                $this->config->getRelationExpression($this->entityName, $entityName),
-                []
-            );
-        }
-
-        $relationCriteria = new self($entityName, $this->config);
-        return $relationCriteria;
+        $relation = new Criteria($entityName);
+        $this->relations[] = $relation;
+        return $relation;
     }
 
     /**
@@ -380,14 +359,4 @@ class Criteria implements CriteriaInterface
         return $this->order;
     }
 
-
-    private function getField($attribute)
-    {
-        $table = $this->config->getTable($this->entityName);
-        $field = $this->config->getFiled($this->entityName, $attribute);
-
-        return $table.".".$field;
-    }
 }
-
-

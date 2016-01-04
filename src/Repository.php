@@ -35,9 +35,9 @@ class Repository implements RepositoryInterface
     protected $mapper;
 
     /**
-     * @var QueryBuilder
+     * @var Config
      */
-    protected $queryBuilder;
+    protected $config;
 
     /**
      * @var ArrayObject
@@ -72,7 +72,7 @@ class Repository implements RepositoryInterface
         CriteriaFactory $criteriaFactory,
         TableGateway $tableGateway,
         Mapper $mapper,
-        QueryBuilder $queryBuilder,
+        Config $config,
         EventManagerInterface $eventManager
     )
     {
@@ -80,7 +80,7 @@ class Repository implements RepositoryInterface
         $this->criteriaFactory = $criteriaFactory;
         $this->tableGateway = $tableGateway;
         $this->mapper = $mapper;
-        $this->queryBuilder = $queryBuilder;
+        $this->config = $config;
         $this->identityMap = new ArrayObject();
         $this->identityMapOriginal = new ArrayObject();
         $this->eventManager = $eventManager;
@@ -224,7 +224,7 @@ class Repository implements RepositoryInterface
     public function createCriteria(array $filter = [])
     {
         if (empty($filter)) {
-            $criteria = new Criteria($this->entityName);
+            $criteria = new Criteria($this->entityName, $this->config);
         } else {
             $criteria = $this->criteriaFactory->build($this->entityName, $filter);
         }

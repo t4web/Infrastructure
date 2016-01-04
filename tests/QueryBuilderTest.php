@@ -6,6 +6,8 @@ use Zend\Db\Adapter\Adapter;
 use T4webInfrastructure\QueryBuilder;
 use T4webInfrastructure\Criteria;
 use T4webInfrastructure\Config;
+use Zend\Db\Sql\Select;
+use Zend\Db\Sql\Where;
 
 class QueryBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -196,4 +198,50 @@ class QueryBuilderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testAndOrGetSelect()
+    {
+
+        $select = new Select();
+        $select->from('users');
+
+        $where = new Where();
+
+            $where4 = new Where();
+                $where2 = new Where();
+                $where2->like('bax', 'bar');
+                $where3 = new Where();
+                $where3->like('foo', 'bar');
+                $where5 = new Where();
+                $where5->like('foo2', 'bar');
+            $where4->orPredicate($where2);
+            $where4->orPredicate($where3);
+            $where4->orPredicate($where5);
+
+        $where->equalTo('id', 5);
+        $where->andPredicate($where4);
+
+        $select->where($where);
+        die(var_dump($select->getSqlString($this->dbAdapter->getPlatform())));
+
+        $qb = new QueryBuilder($this->config);
+
+        $criteria = new Criteria('User');
+        $criteria->greaterThan('id', 5);
+        $criteria->andCriteria()
+            ->like('foo', 'bar')
+            ->orCriteria()
+                ->like('foo', 'bar');
+        $criteria->limit(20);
+        $criteria->order('id');
+
+        $select = $qb->getSelect($criteria);
+
+        $sql = $select->getSqlString($this->dbAdapter->getPlatform());
+
+        $this->assertInstanceOf('Zend\Db\Sql\Select', $select);
+        $this->assertEquals(
+            "SELECT `users`.* FROM `users` WHERE `id` = '5' AND ((`bax` LIKE 'bar') OR (`foo` LIKE 'bar') OR (`foo2` LIKE 'bar'))",
+            $sql
+        );
+    }
 }
