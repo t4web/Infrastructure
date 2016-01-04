@@ -53,6 +53,8 @@ class Criteria implements CriteriaInterface
      * @var Config
      */
     protected $config;
+    protected $sqlSelect;
+    protected $where;
 
     /**
      * @param string $entityName
@@ -61,16 +63,21 @@ class Criteria implements CriteriaInterface
     {
         $this->entityName = $entityName;
         $this->config = $config;
-        if (!$select) {
+        if ($select === null) {
             $this->sqlSelect = new Select();
             $this->sqlSelect->from($this->config->getTable($this->entityName));
+        } else {
+            $this->sqlSelect = $select;
         }
+        $this->where = new Where();
     }
 
     /**
      * @return Select
      */
-    public function getSelect() {
+    public function getSelect()
+    {
+        //$this->sqlSelect->where->equalTo();
         return $this->sqlSelect;
     }
 
@@ -83,6 +90,30 @@ class Criteria implements CriteriaInterface
     }
 
     /**
+     * @param string $entityName
+     * @return CriteriaInterface
+     */
+    public function relation($entityName)
+    {
+        //if ($this->config->isRelationManyToMany($this->entityName, $entityName)) {
+        //$this->buildManyToMany($select, $criteria->getEntityName(), $relation);
+        //} else {
+        $table = $this->config->getTable($entityName);
+
+
+        $this->sqlSelect->join(
+            $table,
+            $this->config->getRelationExpression($this->entityName, $entityName),
+            []
+        );
+        //}
+
+        $relationCriteria = new self($entityName, $this->config, $this->sqlSelect);
+
+        return $relationCriteria;
+    }
+
+    /**
      * @param string $attribute
      * @param bool|int|float|string $value
      * @return $this
@@ -90,9 +121,11 @@ class Criteria implements CriteriaInterface
     public function equalTo($attribute, $value)
     {
         $where = new Where();
-        $where->equalTo($this->getField($attribute), $value);
+        //$this->where->equalTo($this->getField($attribute), $value);
 
-        $this->sqlSelect->where($where);
+        //var_dump($attribute, $this->getField($attribute), $value);
+
+        $this->sqlSelect->where->equalTo($this->getField($attribute), $value);
 
         return $this;
     }
@@ -137,7 +170,8 @@ class Criteria implements CriteriaInterface
         $where = new Where();
         $where->greaterThan($this->getField($attribute), $value);
 
-        $this->sqlSelect->where($where);
+        //$this->sqlSelect->where($where);
+        $this->sqlSelect->where->greaterThan($this->getField($attribute), $value);
 
         return $this;
     }
@@ -210,7 +244,8 @@ class Criteria implements CriteriaInterface
         $where = new Where();
         $where->isNotNull($this->getField($attribute));
 
-        $this->sqlSelect->where($where);
+        //$this->sqlSelect->where($where);
+        $this->sqlSelect->where->isNotNull($this->getField($attribute));
 
         return $this;
     }
@@ -279,28 +314,7 @@ class Criteria implements CriteriaInterface
         return $this;
     }
 
-    /**
-     * @param string $entityName
-     * @return CriteriaInterface
-     */
-    public function relation($entityName)
-    {
-        if ($this->config->isRelationManyToMany($this->entityName, $entityName)) {
-            //$this->buildManyToMany($select, $criteria->getEntityName(), $relation);
-        } else {
-            $table = $this->config->getTable($entityName);
 
-
-            $this->sqlSelect->join(
-                $table,
-                $this->config->getRelationExpression($this->entityName, $entityName),
-                []
-            );
-        }
-
-        $relationCriteria = new self($entityName, $this->config);
-        return $relationCriteria;
-    }
 
     /**
      * @param string $entityName
