@@ -3,153 +3,154 @@
 namespace T4webInfrastructureTest;
 
 use T4webInfrastructure\Criteria;
+use Zend\Db\Adapter\Adapter;
+use T4webInfrastructure\Config;
 
 class CriteriaTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Criteria
-     */
-    private $criteria;
+    private $dbAdapter;
+
+    private $config;
 
     public function setUp()
     {
-        $this->criteria = new Criteria('users');
-    }
+        $this->dbAdapter = new Adapter([
+            'driver'         => 'Pdo',
+            'dsn'            => 'mysql:dbname=board;host=localhost',
+            'driver_options' => array(
+                \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
+            ),
+            'username' => 'board',
+            'password' => '111',
+        ]);
 
-    public function testConstruct()
-    {
-        $this->assertAttributeEquals('users', 'entityName', $this->criteria);
-        $this->assertEquals('users', $this->criteria->getEntityName());
-    }
-
-    public function testPredicate()
-    {
-        $this->criteria->equalTo('id', 2);
-        $this->criteria->notEqualTo('id', 3);
-        $this->criteria->lessThan('id', 4);
-        $this->criteria->greaterThan('id', 5);
-        $this->criteria->greaterThanOrEqualTo('id', 6);
-        $this->criteria->lessThanOrEqualTo('id', 7);
-        $this->criteria->like('name', 'php');
-        $this->criteria->isNull('id');
-        $this->criteria->isNotNull('id');
-        $this->criteria->in('type', [1,2,3]);
-        $this->criteria->between('id', 1, 22);
-
-        $this->assertEquals(
+        $this->config = new Config(
             [
-                [
-                    'name' => 'equalTo',
-                    'attribute' => 'id',
-                    'value' => 2,
+                'User' => [
+                    'table' => 'users',
+                    'columnsAsAttributesMap' => [
+                        'id' => 'id',
+                        'name' => 'name',
+                        'status' => 'status',
+                        'type' => 'type',
+                        'project_id' => 'projectId',
+                        'dt_create' => 'dtCreate',
+                    ],
+                    'relations' => [
+                        'Photo' => ['photos.user_id', 'users.id'],
+                        'Tag' => ['users_tags_link', 'user_id', 'tag_id'],
+                    ],
                 ],
-                [
-                    'name' => 'notEqualTo',
-                    'attribute' => 'id',
-                    'value' => 3,
+                'Photo' => [
+                    'table' => 'photos',
+                    'columnsAsAttributesMap' => [
+                        'status' => 'status',
+                        'contest' => 'contest',
+                    ]
                 ],
-                [
-                    'name' => 'lessThan',
-                    'attribute' => 'id',
-                    'value' => 4,
-                ],
-                [
-                    'name' => 'greaterThan',
-                    'attribute' => 'id',
-                    'value' => 5,
-                ],
-                [
-                    'name' => 'greaterThanOrEqualTo',
-                    'attribute' => 'id',
-                    'value' => 6,
-                ],
-                [
-                    'name' => 'lessThanOrEqualTo',
-                    'attribute' => 'id',
-                    'value' => 7,
-                ],
-                [
-                    'name' => 'like',
-                    'attribute' => 'name',
-                    'value' => 'php',
-                ],
-                [
-                    'name' => 'isNull',
-                    'attribute' => 'id',
-                ],
-                [
-                    'name' => 'isNotNull',
-                    'attribute' => 'id',
-                ],
-                [
-                    'name' => 'in',
-                    'attribute' => 'type',
-                    'values' => [1, 2, 3,],
-                ],
-                [
-                    'name' => 'between',
-                    'attribute' => 'id',
-                    'minValue' => 1,
-                    'maxValue' => 22,
-                ],
-            ],
-            $this->criteria->getPredicate()
+                'Tag' => [
+                    'table' => 'tags',
+                    'columnsAsAttributesMap' => [
+                        'type' => 'type'
+                    ]
+                ]
+            ]
         );
     }
 
-    public function testOrder()
+    public function testPredicates()
     {
-        $this->criteria->order('create_dt DESC');
-        $this->criteria->order('vip_status');
+        $criteria = new Criteria('User', $this->config);
+        $criteria->equalTo('id', 2);
+        $criteria->notEqualTo('id', 3);
+        $criteria->lessThan('projectId', 4);
+        $criteria->greaterThan('id', 5);
+        $criteria->greaterThanOrEqualTo('id', 6);
+        $criteria->lessThanOrEqualTo('id', 7);
+        $criteria->like('name', 'php');
+        $criteria->isNull('id');
+        $criteria->isNotNull('id');
+        $criteria->in('type', [1,2,3]);
+        $criteria->between('id', 1, 22);
+        $criteria->limit(4);
+        $criteria->offset(1);
+        $criteria->order('id');
+
+        $select = $criteria->getQuery();
+
+        $sql = $select->getSqlString($this->dbAdapter->getPlatform());
 
         $this->assertEquals(
-            ['create_dt DESC', 'vip_status'],
-            $this->criteria->getOrder()
+            "SELECT `users`.* "
+            . "FROM `users` "
+            . "WHERE `users`.`id` = '2' "
+            . "AND `users`.`id` != '3' "
+            . "AND `users`.`project_id` < '4' "
+            . "AND `users`.`id` > '5' "
+            . "AND `users`.`id` >= '6' "
+            . "AND `users`.`id` <= '7' "
+            . "AND `users`.`name` LIKE 'php' "
+            . "AND `users`.`id` IS NULL "
+            . "AND `users`.`id` IS NOT NULL "
+            . "AND `users`.`type` IN ('1', '2', '3') "
+            . "AND `users`.`id` BETWEEN '1' AND '22' "
+            . "ORDER BY `users`.`id` ASC "
+            . "LIMIT '4' "
+            . "OFFSET '1'",
+            $sql
         );
     }
 
-    public function testLimitOffset()
+    public function testRelation()
     {
-        $this->criteria->limit(20);
-        $this->criteria->offset(10);
+        $criteria = new Criteria('User', $this->config);
+        $criteria->greaterThan('id', 5);
+        $criteria->limit(20);
+        $criteria->order('id');
+        $criteria->relation('Photo')
+            ->in('status', [2,3]);
 
-        $this->criteria->limit(22);
-        $this->criteria->offset(11);
+        $select = $criteria->getQuery($criteria);
 
-        $this->assertEquals(22, $this->criteria->getLimit());
-        $this->assertEquals(11, $this->criteria->getOffset());
+        $sql = $select->getSqlString($this->dbAdapter->getPlatform());
+
+        $this->assertInstanceOf('Zend\Db\Sql\Select', $select);
+        $this->assertEquals(
+            "SELECT `users`.* "
+            . "FROM `users` "
+            . "INNER JOIN `photos` ON `photos`.`user_id` = `users`.`id` "
+            . "WHERE `users`.`id` > '5' "
+            . "AND `photos`.`status` IN ('2', '3') "
+            . "ORDER BY `users`.`id` ASC "
+            . "LIMIT '20'",
+            $sql
+        );
     }
 
-    public function testRelations()
+    public function testRelationManyToMany()
     {
-        $this->criteria->relation('photos')
-            ->equalTo('status', 3)
-            ->greaterThan('created_dt', '2015-10-30')
-            ->limit(22)
-            ->offset(11);
-
-        $this->criteria->relation('locations')
-            ->equalTo('countryId', 153);
-
-        $relations = $this->criteria->getRelations();
-
-        $this->assertCount(2, $relations);
-        $this->assertInstanceOf('T4webInfrastructure\Criteria', $relations[0]);
-        $this->assertInstanceOf('T4webInfrastructure\Criteria', $relations[1]);
-        $this->assertEquals('photos', $relations[0]->getEntityName());
-        $this->assertEquals('locations', $relations[1]->getEntityName());
-    }
-
-    public function testOrCriteria()
-    {
-        $this->criteria->in('status', [1, 2, 3])
-            ->orCriteria()
+        $criteria = new Criteria('User', $this->config);
+        $criteria->greaterThan('id', 5);
+        $criteria->limit(20);
+        $criteria->order('id');
+        $criteria->relation('Tag')
             ->equalTo('type', 2);
 
-        $orCriteria = $this->criteria->getOr();
+        $select = $criteria->getQuery($criteria);
 
-        $this->assertCount(1, $orCriteria);
-        $this->assertInstanceOf('T4webInfrastructure\Criteria', $orCriteria[0]);
-        $this->assertEquals('users', $orCriteria[0]->getEntityName());
+        $sql = $select->getSqlString($this->dbAdapter->getPlatform());
+
+        $this->assertInstanceOf('Zend\Db\Sql\Select', $select);
+        $this->assertEquals(
+            "SELECT `users`.* "
+            . "FROM `users` "
+            . "INNER JOIN `users_tags_link` ON `users_tags_link`.`user_id` = `users`.`id` "
+            . "INNER JOIN `tags` ON `users_tags_link`.`tag_id` = `tags`.`id` "
+            . "WHERE `users`.`id` > '5' "
+            . "AND `tags`.`type` = '2' "
+            . "ORDER BY `users`.`id` ASC "
+            . "LIMIT '20'",
+            $sql
+        );
     }
 }

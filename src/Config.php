@@ -151,4 +151,17 @@ class Config
 
         return $this->entityMap[$entityName]['columnsAsAttributesMap'];
     }
+
+    /**
+     * @param string $entityName
+     * @return string
+     */
+    public function getNamespace($entityName)
+    {
+        if (isset($this->entityMap[$entityName]['namespace'])) {
+            return $this->entityMap[$entityName]['namespace'];
+        }
+
+        return "{$entityName}s\\$entityName";
+    }
 }
