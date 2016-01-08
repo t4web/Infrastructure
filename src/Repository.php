@@ -4,6 +4,7 @@ namespace T4webInfrastructure;
 
 use ArrayObject;
 use Zend\Db\TableGateway\TableGateway;
+use Zend\Db\Sql\Select;
 use Zend\Db\Sql\Expression;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\Event;
@@ -64,7 +65,7 @@ class Repository implements RepositoryInterface
      * @param CriteriaFactory       $criteriaFactory
      * @param TableGateway          $tableGateway
      * @param Mapper                $mapper
-     * @param QueryBuilder          $queryBuilder
+     * @param Config                $config
      * @param EventManagerInterface $eventManager
      */
     public function __construct(
@@ -149,7 +150,8 @@ class Repository implements RepositoryInterface
      */
     public function find($criteria)
     {
-        $select = $this->queryBuilder->getSelect($criteria);
+        /** @var Select $select */
+        $select = $criteria->getQuery();
 
         $select->limit(1)->offset(0);
         $result = $this->tableGateway->selectWith($select)->toArray();
@@ -183,7 +185,8 @@ class Repository implements RepositoryInterface
      */
     public function findMany($criteria)
     {
-        $select = $this->queryBuilder->getSelect($criteria);
+        /** @var Select $select */
+        $select = $criteria->getQuery();
 
         $rows = $this->tableGateway->selectWith($select)->toArray();
 
@@ -202,7 +205,8 @@ class Repository implements RepositoryInterface
      */
     public function count($criteria)
     {
-        $select = $this->queryBuilder->getSelect($criteria);
+        /** @var Select $select */
+        $select = $criteria->getQuery();
         $select->columns(["row_count" => new Expression("COUNT(*)")]);
 
         $select->reset('limit');

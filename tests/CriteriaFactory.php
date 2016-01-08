@@ -3,6 +3,7 @@
 namespace T4webInfrastructureTest;
 
 use T4webInfrastructure\CriteriaFactory;
+use T4webInfrastructure\Config;
 use Zend\Stdlib\ArrayObject;
 
 class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
@@ -19,8 +20,35 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
 
     public function testBuild()
     {
+        $config = new Config(
+            [
+                'Task' => [
+                    'table' => 'tasks',
+                    'columnsAsAttributesMap' => [
+                        'id' => 'id',
+                        'user_id' => 'userId',
+                        'status' => 'status',
+                        'date_create' => 'dateCreate',
+                    ],
+                    'relations' => [
+                        'User' => ['tasks.user_id', 'users.id'],
+                    ],
+                ],
+                'User' => [
+                    'table' => 'users',
+                    'columnsAsAttributesMap' => [
+                        'id' => 'id',
+                        'name' => 'name',
+                        'status' => 'status',
+                        'date_create' => 'dateCreate',
+                    ],
+                ],
+            ]
+        );
+
         $criteria = $this->criteriaFactory->build(
             'Task',
+            $config,
             [
                 'status.equalTo' => 2,
                 'dateCreate.greaterThan' => '2015-10-30',

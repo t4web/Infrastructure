@@ -10,7 +10,6 @@ use T4webDomainInterface\EntityInterface;
 use T4webDomainInterface\EntityFactoryInterface;
 use T4webInfrastructure\Repository;
 use T4webInfrastructure\Mapper;
-use T4webInfrastructure\QueryBuilder;
 use T4webInfrastructure\Config;
 
 class Task implements EntityInterface
@@ -111,8 +110,8 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
                 'status' => 'status',
                 'type' => 'type',
             ],
-            new EntityFactory('T4webDomainTest\Task', 'ArrayObject'));
-
+            new EntityFactory('T4webDomainTest\Task', 'ArrayObject')
+        );
         $config = new Config(
             [
                 'Task' => [
@@ -123,24 +122,21 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
                         'name' => 'name',
                         'assigneeId' => 'assignee_id',
                         'status' => 'status',
+                        'date_create' => 'dateCreate',
                         'type' => 'type',
                     ],
                 ]
             ]
         );
-
-        $queryBuilder = new QueryBuilder($config);
-
+        $criteriaFactory = new CriteriaFactory($config);
         $em = new EventManager();
-
-        $criteriaFactory = new CriteriaFactory();
 
         $this->repository = new Repository(
             'Task',
             $criteriaFactory,
             $tableGateway,
             $mapper,
-            $queryBuilder,
+            $config,
             $em
         );
     }
@@ -154,20 +150,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testCreateCriteriaWithFilter()
     {
-        $criteria = $this->repository->createCriteria(
-            [
-                'status.equalTo' => 2,
-                'status.or.equalTo' => 3,
-                'dateCreate.greaterThan' => '2015-10-30',
-
-                'relations' => [
-                    'User' => [
-                        'status.in' => [2, 3, 4],
-                        'name.like' => 'gor'
-                    ]
-                ]
-            ]
-        );
+        $criteria = $this->repository->createCriteria(['status.equalTo' => 2]);
 
         $this->assertInstanceOf('T4webDomainInterface\Infrastructure\CriteriaInterface', $criteria);
     }
@@ -266,17 +249,4 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(1, $rowsAffected);
     }
-
-/*
-    public function testRemove()
-    {
-        $id = 4;
-
-        $entity = $this->repository->find(new Criteria('id', 'equalTo', $id));
-
-        $rowsAffected = $this->repository->remove($entity);
-
-        $this->assertEquals(1, $rowsAffected);
-    }
-*/
 }
