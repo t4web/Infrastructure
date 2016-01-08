@@ -234,7 +234,7 @@ class Criteria implements CriteriaInterface
         if (count($exploded) == 2) {
             $order = $this->getField($exploded[0]) . ' ' . $exploded[1];
         } else {
-            $order = $attribute;
+            $order = $this->getField($attribute);
         }
 
         $this->select->order($order);
