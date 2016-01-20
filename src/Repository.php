@@ -212,6 +212,7 @@ class Repository implements RepositoryInterface
         $select->reset('limit');
         $select->reset('offset');
         $select->reset('order');
+        $select->reset('group');
 
         $result = $this->tableGateway->selectWith($select)->toArray();
 
