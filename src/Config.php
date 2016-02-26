@@ -154,6 +154,28 @@ class Config
 
     /**
      * @param string $entityName
+     * @return string|null
+     */
+    public function getPrimaryKey($entityName)
+    {
+        if (isset($this->entityMap[$entityName]['primaryKey'])) {
+            return $this->entityMap[$entityName]['primaryKey'];
+        }
+    }
+
+    /**
+     * @param string $entityName
+     * @return string|null
+     */
+    public function getSequence($entityName)
+    {
+        if (isset($this->entityMap[$entityName]['sequence'])) {
+            return $this->entityMap[$entityName]['sequence'];
+        }
+    }
+
+    /**
+     * @param string $entityName
      * @return string
      */
     public function getNamespace($entityName)
