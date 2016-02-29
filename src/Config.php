@@ -176,6 +176,17 @@ class Config
 
     /**
      * @param string $entityName
+     * @return string|null
+     */
+    public function getCriteriaMap($entityName)
+    {
+        if (isset($this->entityMap[$entityName]['criteriaMap'])) {
+            return $this->entityMap[$entityName]['criteriaMap'];
+        }
+    }
+
+    /**
+     * @param string $entityName
      * @return string
      */
     public function getNamespace($entityName)

@@ -64,6 +64,11 @@ class CriteriaFactory
     {
         foreach ($filter as $expressionString => $value) {
 
+            $criteriaMap = $this->config->getCriteriaMap($criteria->getEntityName());
+            if (isset($criteriaMap[$expressionString])) {
+                $expressionString = $criteriaMap[$expressionString];
+            }
+
             if (in_array($expressionString, ['limit', 'offset'])) {
                 $value = (int)$value;
                 if ($value < 0) {

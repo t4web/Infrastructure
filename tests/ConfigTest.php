@@ -34,6 +34,9 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'User' => ['tasks.assignee_id', 'user.id'],
                     'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
                 ],
+                'criteriaMap' => [
+                    'id' => 'id_equalTo',
+                ],
             ],
         ];
 
@@ -79,5 +82,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $columnsMap = $this->config->getColumnsAsAttributesMap('Task');
 
         $this->assertEquals($this->entityMap['Task']['columnsAsAttributesMap'], $columnsMap);
+    }
+
+    public function testGetCriteriaMap()
+    {
+        $criteriaMap = $this->config->getCriteriaMap('Task');
+
+        $this->assertEquals($this->entityMap['Task']['criteriaMap'], $criteriaMap);
     }
 }
