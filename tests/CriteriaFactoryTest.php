@@ -27,6 +27,9 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
                     'relations' => [
                         'User' => ['tasks.user_id', 'users.id'],
                     ],
+                    'criteriaMap' => [
+                        'date_more' => 'dateCreate.greaterThan',
+                    ],
                 ],
                 'User' => [
                     'table' => 'users',
@@ -48,8 +51,8 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
         $criteria = $this->criteriaFactory->build(
             'Task',
             [
-                'status.equalTo' => 2,
-                'dateCreate.greaterThan' => '2015-10-30',
+                'T4webInfrastructureTest\Assets\Active' => true,
+                'date_more' => '2015-10-30',
 
                 'relations' => [
                     'User' => [

@@ -199,4 +199,14 @@ class Config
 
         return "{$entityName}s\\$entityName";
     }
+
+    public function getCustomCriteriaClass($entityName, $criteriaName)
+    {
+        if (class_exists($criteriaName)) {
+            return $criteriaName;
+        }
+
+        $className = "$entityName\\Infrastructure\\Criteria\\$criteriaName";
+        return $className;
+    }
 }

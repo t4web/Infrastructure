@@ -197,6 +197,14 @@ $inputData = [
 ]
 ```
 
+Custom criteria - grouping and reusing criteria
+```php
+$inputData = [
+    'Users\User\Criteria\Active' => true,
+]
+```
+`Users\User\Criteria\Active` - must be invokable class (`__invoke(CriteriaInterface $criteria, $value)`)
+
 ## Configuring
 
 For configuring `Repository` you must specify config, and use `Config` object for parsing config. `QueryBuilder` 
@@ -230,6 +238,12 @@ $entityMapConfig = [
             
             // relation entity name + table.field for building JOIN
             'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
+        ],
+
+        // for aliasing long\ugly criterias
+        'criteriaMap' => [
+            // alias => criteria
+            'date_more' => 'dateCreate.greaterThan',
         ],
     ],
 ]

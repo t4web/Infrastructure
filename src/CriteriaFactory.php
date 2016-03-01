@@ -131,32 +131,37 @@ class CriteriaFactory
             }
 
             if (count($expressionArray) == 1) {
-                $customCriteria = ucfirst($expressionArray[0]);
-                $entityNamespace = $this->config->getNamespace($criteria->getEntityName());
-                $customCriteriaClass = "$entityNamespace\\Infrastructure\\Criteria\\$customCriteria";
-
-                if (!class_exists($customCriteriaClass)) {
-                    throw new RuntimeException(
-                        sprintf('Wrong criteria %s. Class %s does not exists.', $customCriteria, $customCriteriaClass)
-                    );
-                }
-
-                $customCriteriaInstance = new $customCriteriaClass();
-
-                if (!is_callable($customCriteriaInstance)) {
-                    throw new RuntimeException(
-                        sprintf(
-                            'Wrong criteria %s. Object of type %s is not callable.',
-                            $customCriteria,
-                            $customCriteriaClass
-                        )
-                    );
-                }
-
+                $customCriteriaInstance = $this->buildCustomCriteria($expressionArray[0], $criteria);
                 $customCriteriaInstance($criteria, $value);
             }
         }
 
         return $criteria;
+    }
+
+    public function buildCustomCriteria($criteriaName, $baseCriteria)
+    {
+        $customCriteria = ucfirst($criteriaName);
+        $customCriteriaClass = $this->config->getCustomCriteriaClass($baseCriteria->getEntityName(), $customCriteria);
+
+        if (!class_exists($customCriteriaClass)) {
+            throw new RuntimeException(
+                sprintf('Wrong criteria %s. Class %s does not exists.', $customCriteria, $customCriteriaClass)
+            );
+        }
+
+        $customCriteriaInstance = new $customCriteriaClass();
+
+        if (!is_callable($customCriteriaInstance)) {
+            throw new RuntimeException(
+                sprintf(
+                    'Wrong criteria %s. Object of type %s is not callable.',
+                    $customCriteria,
+                    $customCriteriaClass
+                )
+            );
+        }
+
+        return $customCriteriaInstance;
     }
 }
