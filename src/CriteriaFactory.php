@@ -147,5 +147,4 @@ class CriteriaFactory
 
         return $criteria;
     }
-
 }

@@ -59,7 +59,7 @@ class Mapper
      */
     public function fromTableRows(array $rows)
     {
-        $attributesValues = array();
+        $attributesValues = [];
         foreach ($rows as $row) {
             $attributesValues[] = $this->getIntersectValuesAsKeys(array_flip($this->columnsAsAttributesMap), $row);
         }
@@ -74,7 +74,7 @@ class Mapper
      */
     private function getIntersectValuesAsKeys($array1, $array2)
     {
-        $result = array();
+        $result = [];
 
         foreach ($array1 as $key => $value) {
             if (array_key_exists($value, $array2)) {

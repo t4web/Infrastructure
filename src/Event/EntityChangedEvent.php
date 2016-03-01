@@ -49,5 +49,4 @@ class EntityChangedEvent extends Event
     {
         $this->originalEntity = $originalEntity;
     }
-
 }

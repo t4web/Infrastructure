@@ -17,9 +17,9 @@ class CriteriaTest extends \PHPUnit_Framework_TestCase
         $this->dbAdapter = new Adapter([
             'driver'         => 'Pdo',
             'dsn'            => 'mysql:dbname=board;host=localhost',
-            'driver_options' => array(
+            'driver_options' => [
                 \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-            ),
+            ],
             'username' => 'board',
             'password' => '111',
         ]);

@@ -55,21 +55,25 @@ class Task implements EntityInterface
     }
 }
 
-class EntityFactory implements EntityFactoryInterface {
+class EntityFactory implements EntityFactoryInterface
+{
 
     protected $entityClass;
     protected $collectionClass;
 
-    public function __construct($entityClass, $collectionClass = 'T4webBase\Domain\Collection') {
+    public function __construct($entityClass, $collectionClass = 'T4webBase\Domain\Collection')
+    {
         $this->entityClass = $entityClass;
         $this->collectionClass = $collectionClass;
     }
 
-    public function create(array $data) {
+    public function create(array $data)
+    {
         return new $this->entityClass($data);
     }
 
-    public function createCollection(array $data) {
+    public function createCollection(array $data)
+    {
         $collection = new $this->collectionClass();
 
         foreach ($data as $value) {
@@ -79,7 +83,6 @@ class EntityFactory implements EntityFactoryInterface {
 
         return $collection;
     }
-
 }
 
 class RepositoryTest extends \PHPUnit_Framework_TestCase
@@ -94,9 +97,9 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $dbAdapter = new Adapter([
             'driver'         => 'Pdo',
             'dsn'            => 'mysql:dbname=board;host=localhost',
-            'driver_options' => array(
+            'driver_options' => [
                 \PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES \'UTF8\''
-            ),
+            ],
             'username' => 'board',
             'password' => '111',
         ]);

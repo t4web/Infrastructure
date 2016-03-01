@@ -75,8 +75,8 @@ class Repository implements RepositoryInterface
         Mapper $mapper,
         Config $config,
         EventManagerInterface $eventManager
-    )
-    {
+    ) {
+
         $this->entityName = $entityName;
         $this->criteriaFactory = $criteriaFactory;
         $this->tableGateway = $tableGateway;
@@ -336,5 +336,4 @@ class Repository implements RepositoryInterface
     {
         return sprintf('attribute:%s:%s:changed', get_class($changedEntity), $attributeName);
     }
-
 }
