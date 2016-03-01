@@ -72,7 +72,9 @@ class CriteriaFactory
             if (in_array($expressionString, ['limit', 'offset'])) {
                 $value = (int)$value;
                 if ($value < 0) {
-                    throw new RuntimeException(sprintf('Predicate %s must unsigned int, %s given', $expressionString, $value));
+                    throw new RuntimeException(
+                        sprintf('Predicate %s must unsigned int, %s given', $expressionString, $value)
+                    );
                 }
 
                 $criteria->{$expressionString}($value);
@@ -112,7 +114,9 @@ class CriteriaFactory
 
                 if ($method == 'between') {
                     if (!is_array($value) || !isset($value[0]) || !isset($value[1])) {
-                        throw new RuntimeException(sprintf('Predicate %s must contain array [MIN_VALUE, MAX_VALUE], ', $method));
+                        throw new RuntimeException(
+                            sprintf('Predicate %s must contain array [MIN_VALUE, MAX_VALUE], ', $method)
+                        );
                     }
 
                     $criteria->between($attribute, $value[0], $value[1]);
@@ -132,13 +136,21 @@ class CriteriaFactory
                 $customCriteriaClass = "$entityNamespace\\Infrastructure\\Criteria\\$customCriteria";
 
                 if (!class_exists($customCriteriaClass)) {
-                    throw new RuntimeException(sprintf('Wrong criteria %s. Class %s does not exists.', $customCriteria, $customCriteriaClass));
+                    throw new RuntimeException(
+                        sprintf('Wrong criteria %s. Class %s does not exists.', $customCriteria, $customCriteriaClass)
+                    );
                 }
 
                 $customCriteriaInstance = new $customCriteriaClass();
 
                 if (!is_callable($customCriteriaInstance)) {
-                    throw new RuntimeException(sprintf('Wrong criteria %s. Object of type %s is not callable.', $customCriteria, $customCriteriaClass));
+                    throw new RuntimeException(
+                        sprintf(
+                            'Wrong criteria %s. Object of type %s is not callable.',
+                            $customCriteria,
+                            $customCriteriaClass
+                        )
+                    );
                 }
 
                 $customCriteriaInstance($criteria, $value);

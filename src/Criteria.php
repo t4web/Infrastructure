@@ -61,7 +61,9 @@ class Criteria implements CriteriaInterface
     {
         if ($this->config->isRelationManyToMany($this->entityName, $entityName)) {
 
-            list($linkTable, $mainField, $joinedField) = $this->config->getRelationManyToMany($this->entityName, $entityName);
+            list($linkTable,
+                $mainField,
+                $joinedField) = $this->config->getRelationManyToMany($this->entityName, $entityName);
 
             $mainTable = $this->config->getTable($this->entityName);
             $joinedTable = $this->config->getTable($entityName);

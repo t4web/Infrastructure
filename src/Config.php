@@ -41,7 +41,9 @@ class Config
         $field = array_search($attribute, $this->entityMap[$entityName]['columnsAsAttributesMap']);
 
         if (!$field) {
-            throw new ConfigException(sprintf("attributes %s not exists in entity_map[columnsAsAttributesMap] config", $attribute));
+            throw new ConfigException(
+                sprintf("attributes %s not exists in entity_map[columnsAsAttributesMap] config", $attribute)
+            );
         }
 
         return $field;

@@ -1,89 +1,14 @@
 <?php
 
-namespace T4webDomainTest;
+namespace T4webInfrastructureTest;
 
 use T4webInfrastructure\CriteriaFactory;
 use Zend\Db\TableGateway\TableGateway;
 use Zend\Db\Adapter\Adapter;
 use Zend\EventManager\EventManager;
-use T4webDomainInterface\EntityInterface;
-use T4webDomainInterface\EntityFactoryInterface;
 use T4webInfrastructure\Repository;
 use T4webInfrastructure\Mapper;
 use T4webInfrastructure\Config;
-
-class Task implements EntityInterface
-{
-    protected $id;
-    protected $name;
-    protected $assignee;
-
-    public function __construct(array $data = [])
-    {
-        $this->populate($data);
-    }
-
-    public function getId()
-    {
-        return $this->id;
-    }
-
-    public function extract(array $properties = [])
-    {
-        $state = get_object_vars($this);
-
-        if (empty($properties)) {
-            return $state;
-        }
-
-        $rawArray = array_fill_keys($properties, null);
-
-        return array_intersect_key($state, $rawArray);
-    }
-
-    public function populate(array $array = [])
-    {
-        $state = get_object_vars($this);
-
-        $stateIntersect = array_intersect_key($array, $state);
-
-        foreach ($stateIntersect as $key => $value) {
-            $this->$key = $value;
-        }
-
-        return $this;
-    }
-}
-
-class EntityFactory implements EntityFactoryInterface
-{
-
-    protected $entityClass;
-    protected $collectionClass;
-
-    public function __construct($entityClass, $collectionClass = 'T4webBase\Domain\Collection')
-    {
-        $this->entityClass = $entityClass;
-        $this->collectionClass = $collectionClass;
-    }
-
-    public function create(array $data)
-    {
-        return new $this->entityClass($data);
-    }
-
-    public function createCollection(array $data)
-    {
-        $collection = new $this->collectionClass();
-
-        foreach ($data as $value) {
-            $entity = $this->create($value);
-            $collection->offsetSet($entity->getId(), $entity);
-        }
-
-        return $collection;
-    }
-}
 
 class RepositoryTest extends \PHPUnit_Framework_TestCase
 {
@@ -113,7 +38,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
                 'status' => 'status',
                 'type' => 'type',
             ],
-            new EntityFactory('T4webDomainTest\Task', 'ArrayObject')
+            new Assets\EntityFactory('T4webInfrastructureTest\Assets\Task', 'ArrayObject')
         );
         $config = new Config(
             [
@@ -166,7 +91,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->repository->find($criteria);
 
-        $this->assertInstanceOf('T4webDomainTest\Task', $entity);
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
         $this->assertEquals($id, $entity->getId());
     }
 
@@ -187,7 +112,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->repository->findById($id);
 
-        $this->assertInstanceOf('T4webDomainTest\Task', $entity);
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
         $this->assertEquals($id, $entity->getId());
     }
 
@@ -224,15 +149,15 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testAddInsert()
     {
-        $newEntity = $this->repository->add(new Task(['name' => 'Some name', 'assignee' => 'AA']));
+        $newEntity = $this->repository->add(new Assets\Task(['name' => 'Some name', 'assignee' => 'AA']));
 
-        $this->assertInstanceOf('T4webDomainTest\Task', $newEntity);
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $newEntity);
 
         $criteria = $this->repository->createCriteria();
         $criteria->equalTo('id', $newEntity->getId());
         $entity = $this->repository->find($criteria);
 
-        $this->assertInstanceOf('T4webDomainTest\Task', $entity);
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
         $this->assertEquals($newEntity->getId(), $entity->getId());
     }
 
@@ -244,7 +169,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->repository->find($criteria);
 
-        $this->assertInstanceOf('T4webDomainTest\Task', $entity);
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
 
         $entity->populate(['name' => date('His'), 'assignee' => date('is')]);
 

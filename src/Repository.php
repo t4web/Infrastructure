@@ -277,7 +277,11 @@ class Repository implements RepositoryInterface
     {
         $this->eventManager->addIdentifiers(get_class($createdEntity));
 
-        $event = new Event(sprintf('entity:%s:created', get_class($createdEntity)), $this, ['entity' => $createdEntity]);
+        $event = new Event(
+            sprintf('entity:%s:created', get_class($createdEntity)),
+            $this,
+            ['entity' => $createdEntity]
+        );
         $this->eventManager->trigger($event);
 
         if ($event->getParam('entity') && $event->getParam('entity') instanceof EntityInterface) {
