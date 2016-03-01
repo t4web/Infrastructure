@@ -53,13 +53,16 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
             [
                 'T4webInfrastructureTest\Assets\Active' => true,
                 'date_more' => '2015-10-30',
+                'id.isNotNull' => true,
+                'dateCreate.between' => ['2015-10-30', '2015-10-31'],
 
                 'relations' => [
                     'User' => [
                         'status.in' => [2, 3, 4],
                         'name.like' => 'gor'
                     ]
-                ]
+                ],
+                'limit' => 5
             ]
         );
 
@@ -85,9 +88,33 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
             . " INNER JOIN `users` ON `tasks`.`user_id` = `users`.`id`"
             . " WHERE `tasks`.`status` = '2'"
             . " AND `tasks`.`date_create` > '2015-10-30'"
+            . " AND `tasks`.`id` IS NOT NULL"
+            . " AND `tasks`.`date_create` BETWEEN '2015-10-30' AND '2015-10-31'"
             . " AND `users`.`status` IN ('2', '3', '4')"
-            . " AND `users`.`name` LIKE 'gor'",
+            . " AND `users`.`name` LIKE 'gor'"
+            . " LIMIT '5'",
             $select->getSqlString($dbAdapter->getPlatform())
+        );
+    }
+
+    public function testBuildWithNotCallableCustomCriteria()
+    {
+        $this->setExpectedException(\RuntimeException::class);
+
+        $criteria = $this->criteriaFactory->build(
+            'Task',
+            [
+                'T4webInfrastructureTest\Assets\ActiveNotCallable' => true,
+                'date_more' => '2015-10-30',
+
+                'relations' => [
+                    'User' => [
+                        'status.in' => [2, 3, 4],
+                        'name.like' => 'gor'
+                    ]
+                ],
+                'limit' => 5
+            ]
         );
     }
 }
