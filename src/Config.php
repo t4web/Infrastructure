@@ -206,7 +206,9 @@ class Config
             return $criteriaName;
         }
 
-        $className = "$entityName\\Infrastructure\\Criteria\\$criteriaName";
+        $entityNamespace = $this->getNamespace($entityName);
+        $className = "$entityNamespace\\Infrastructure\\Criteria\\$criteriaName";
+        
         return $className;
     }
 }
