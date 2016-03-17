@@ -232,14 +232,21 @@ class Criteria implements CriteriaInterface
      */
     public function order($attribute)
     {
-        $exploded = explode(' ', $attribute);
-        if (count($exploded) == 2) {
-            $order = $this->getField($exploded[0]) . ' ' . $exploded[1];
-        } else {
-            $order = $this->getField($attribute);
+        $orders = explode(',', $attribute);
+        $sqlOrders = [];
+
+        foreach ($orders as $item) {
+            $exploded = explode(' ', trim($item));
+            if (count($exploded) == 2) {
+                $order = $this->getField($exploded[0]) . ' ' . $exploded[1];
+            } else {
+                $order = $this->getField($attribute);
+            }
+
+            $sqlOrders[] = $order;
         }
 
-        $this->select->order($order);
+        $this->select->order($sqlOrders);
 
         return $this;
     }
