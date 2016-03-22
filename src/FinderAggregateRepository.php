@@ -78,7 +78,7 @@ class FinderAggregateRepository implements RepositoryInterface
             throw new \RuntimeException(get_class($this) . ": related $entityName repository not exists");
         }
 
-        $this->with[$entityName] = new ArrayObject();
+        $this->with[$entityName] = [];
     }
 
     /**
@@ -103,21 +103,26 @@ class FinderAggregateRepository implements RepositoryInterface
 
         $row = $result[0];
 
-        foreach ($this->with as $relatedEntityName => $relatedEntityIds) {
+        $relatedEntityIds = [];
+        foreach ($this->with as $relatedEntityName => $cascadeWith) {
             $relatedField = $this->getRelatedField($relatedEntityName);
 
             if (!isset($row[$relatedField])) {
                 throw new \RuntimeException(get_class($this) . ": relation field $relatedEntityName not fetched");
             }
 
-            if (!in_array($row[$relatedField], (array)$relatedEntityIds)) {
-                $relatedEntityIds->append($row[$relatedField]);
+            if (!isset($relatedEntityIds[$relatedEntityName])) {
+                $relatedEntityIds[$relatedEntityName] = new ArrayObject();
+            }
+
+            if (!in_array($row[$relatedField], (array)$relatedEntityIds[$relatedEntityName])) {
+                $relatedEntityIds[$relatedEntityName]->append($row[$relatedField]);
             }
         }
 
         $relatedEntities = [];
-        foreach ($this->with as $relatedEntityName => $relatedEntityIds) {
-            $criteria = $this->relatedRepository[$relatedEntityName]->createCriteria(['id.in' => (array)$relatedEntityIds]);
+        foreach ($this->with as $relatedEntityName => $cascadeWith) {
+            $criteria = $this->relatedRepository[$relatedEntityName]->createCriteria(['id.in' => (array)$relatedEntityIds[$relatedEntityName]]);
             $relatedEntities[$relatedEntityName] = $this->relatedRepository[$relatedEntityName]->findMany($criteria);
         }
 
@@ -162,22 +167,26 @@ class FinderAggregateRepository implements RepositoryInterface
         $rows = $this->tableGateway->selectWith($select)->toArray();
 
         foreach ($rows as $row) {
-            foreach ($this->with as $relatedEntityName => $relatedEntityIds) {
+            foreach ($this->with as $relatedEntityName => $cascadeWith) {
                 $relatedField = $this->getRelatedField($relatedEntityName);
 
                 if (!isset($row[$relatedField])) {
                     throw new \RuntimeException(get_class($this) . ": relation field $relatedEntityName not fetched");
                 }
 
-                if (!in_array($row[$relatedField], (array)$relatedEntityIds)) {
-                    $relatedEntityIds->append($row[$relatedField]);
+                if (!isset($relatedEntityIds[$relatedEntityName])) {
+                    $relatedEntityIds[$relatedEntityName] = new ArrayObject();
+                }
+
+                if (!in_array($row[$relatedField], (array)$relatedEntityIds[$relatedEntityName])) {
+                    $relatedEntityIds[$relatedEntityName]->append($row[$relatedField]);
                 }
             }
         }
 
         $relatedEntities = [];
-        foreach ($this->with as $relatedEntityName => $relatedEntityIds) {
-            $criteria = $this->relatedRepository[$relatedEntityName]->createCriteria(['id.in' => (array)$relatedEntityIds]);
+        foreach ($this->with as $relatedEntityName => $cascadeWith) {
+            $criteria = $this->relatedRepository[$relatedEntityName]->createCriteria(['id.in' => (array)$relatedEntityIds[$relatedEntityName]]);
             $relatedEntities[$relatedEntityName] = $this->relatedRepository[$relatedEntityName]->findMany($criteria);
         }
 
