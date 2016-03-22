@@ -234,9 +234,11 @@ $entityMapConfig = [
         'relations' => [
         
             // relation entity name + table.field for building JOIN
+            // name => [FK in cur. entity, PK in related entity]
             'User' => ['tasks.assignee_id', 'user.id'],
             
             // relation entity name + table.field for building JOIN
+            // name => [link-tabe, link-table field for cur. entity, link-table field for related entity]
             'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
         ],
 
@@ -250,6 +252,8 @@ $entityMapConfig = [
 ```
 
 `relations` argument order - very important, `Task['relations']['User'][0]` - must be field from current entity, `Task['relations']['User'][1]` - must be field from related entity.
+
+For many-to-many relation related entity must contain 3 arguments. For example we have table `tasks` (see config), table `tags` with fields `id`, `name` and table `tasks_tags_link` with fields `task_id` and `tag_id`. For relation Task <=> Tag we must describe many-to-many relation: `Task['relations']['Tag'][0]` - link-table name, `Task['relations']['Tag'][1]` - field PK current entity in link-table and `Task['relations']['Tag'][2]` - field PK in related entity in link-table.
 
 ## Events
 
