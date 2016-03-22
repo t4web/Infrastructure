@@ -22,6 +22,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->entityMap = [
             'Task' => [
                 'table' => 'tasks',
+                'entityClass' => 'Tasks\Task\Task',
                 'columnsAsAttributesMap' => [
                     'id' => 'id',
                     'projectId' => 'project_id',
@@ -53,6 +54,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $table = $this->config->getTable('Task');
 
         $this->assertEquals($this->entityMap['Task']['table'], $table);
+    }
+
+    public function testGetEntityClass()
+    {
+        $entityClass = $this->config->getEntityClass('Task');
+
+        $this->assertEquals($this->entityMap['Task']['entityClass'], $entityClass);
     }
 
     public function testGetRelationExpression()
