@@ -11,6 +11,7 @@ use Zend\EventManager\Event;
 use T4webDomainInterface\Infrastructure\CriteriaInterface;
 use T4webDomainInterface\Infrastructure\RepositoryInterface;
 use T4webDomainInterface\EntityInterface;
+use T4webDomainInterface\EntityFactoryInterface;
 use T4webInfrastructure\Event\EntityChangedEvent;
 
 class Repository implements RepositoryInterface
@@ -36,9 +37,9 @@ class Repository implements RepositoryInterface
     protected $mapper;
 
     /**
-     * @var Config
+     * @var EntityFactoryInterface
      */
-    protected $config;
+    protected $entityFactory;
 
     /**
      * @var ArrayObject
@@ -65,7 +66,7 @@ class Repository implements RepositoryInterface
      * @param CriteriaFactory       $criteriaFactory
      * @param TableGateway          $tableGateway
      * @param Mapper                $mapper
-     * @param Config                $config
+     * @param EntityFactoryInterface $entityFactory
      * @param EventManagerInterface $eventManager
      */
     public function __construct(
@@ -73,7 +74,7 @@ class Repository implements RepositoryInterface
         CriteriaFactory $criteriaFactory,
         TableGateway $tableGateway,
         Mapper $mapper,
-        Config $config,
+        EntityFactoryInterface $entityFactory,
         EventManagerInterface $eventManager
     ) {
 
@@ -81,7 +82,7 @@ class Repository implements RepositoryInterface
         $this->criteriaFactory = $criteriaFactory;
         $this->tableGateway = $tableGateway;
         $this->mapper = $mapper;
-        $this->config = $config;
+        $this->entityFactory = $entityFactory;
         $this->identityMap = new ArrayObject();
         $this->identityMapOriginal = new ArrayObject();
         $this->eventManager = $eventManager;
@@ -160,7 +161,9 @@ class Repository implements RepositoryInterface
             return;
         }
 
-        $entity = $this->mapper->fromTableRow($result[0]);
+        $attributesValues = $this->mapper->fromTableRow($result[0]);
+
+        $entity = $this->entityFactory->create($attributesValues);
 
         $this->toIdentityMap($entity);
 
@@ -190,7 +193,9 @@ class Repository implements RepositoryInterface
 
         $rows = $this->tableGateway->selectWith($select)->toArray();
 
-        $entities = $this->mapper->fromTableRows($rows);
+        $attributesValues = $this->mapper->fromTableRows($rows);
+
+        $entities = $this->entityFactory->createCollection($attributesValues);
 
         foreach ($entities as $entity) {
             $this->toIdentityMap($entity);
@@ -229,13 +234,7 @@ class Repository implements RepositoryInterface
      */
     public function createCriteria(array $filter = [])
     {
-        if (empty($filter)) {
-            $criteria = new Criteria($this->entityName, $this->config);
-        } else {
-            $criteria = $this->criteriaFactory->build($this->entityName, $filter);
-        }
-
-        return $criteria;
+        return $this->criteriaFactory->build($this->entityName, $filter);
     }
 
     /**

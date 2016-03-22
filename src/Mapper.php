@@ -3,7 +3,6 @@
 namespace T4webInfrastructure;
 
 use T4webDomainInterface\EntityInterface;
-use T4webDomainInterface\EntityFactoryInterface;
 
 class Mapper
 {
@@ -13,18 +12,11 @@ class Mapper
     protected $columnsAsAttributesMap;
 
     /**
-     * @var EntityFactoryInterface
-     */
-    protected $entityFactory;
-
-    /**
      * @param array $columnsAsAttributesMap
-     * @param EntityFactoryInterface $factory
      */
-    public function __construct(array $columnsAsAttributesMap, EntityFactoryInterface $factory)
+    public function __construct(array $columnsAsAttributesMap)
     {
         $this->columnsAsAttributesMap = $columnsAsAttributesMap;
-        $this->entityFactory = $factory;
     }
 
     /**
@@ -44,27 +36,27 @@ class Mapper
 
     /**
      * @param array $row
-     * @return EntityInterface
+     * @return array
      */
     public function fromTableRow(array $row)
     {
         $attributesValues = $this->getIntersectValuesAsKeys(array_flip($this->columnsAsAttributesMap), $row);
 
-        return $this->entityFactory->create($attributesValues);
+        return $attributesValues;
     }
 
     /**
      * @param array $rows
-     * @return EntityInterface[]
+     * @return array
      */
     public function fromTableRows(array $rows)
     {
         $attributesValues = [];
         foreach ($rows as $row) {
-            $attributesValues[] = $this->getIntersectValuesAsKeys(array_flip($this->columnsAsAttributesMap), $row);
+            $attributesValues[] = $this->fromTableRow($row);
         }
 
-        return $this->entityFactory->createCollection($attributesValues);
+        return $attributesValues;
     }
 
     /**
