@@ -229,6 +229,9 @@ $entityMapConfig = [
         
         // table name
         'table' => 'tasks',
+
+        // use for short namespace
+        'entityClass' => 'Tasks\Task\Task',
         
         // map for entity attribute <=> table fields
         'columnsAsAttributesMap' => [

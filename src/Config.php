@@ -29,6 +29,19 @@ class Config
 
     /**
      * @param string $entityName
+     * @return string mixed
+     */
+    public function getEntityClass($entityName)
+    {
+        if (!isset($this->entityMap[$entityName]['entityClass'])) {
+            throw new ConfigException(sprintf("entity_map[entityClass] not configured for %s", $entityName));
+        }
+
+        return $this->entityMap[$entityName]['entityClass'];
+    }
+
+    /**
+     * @param string $entityName
      * @param string $attribute
      * @return string
      */
