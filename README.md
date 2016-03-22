@@ -249,7 +249,7 @@ $entityMapConfig = [
 ]
 ```
 
-`relations` argument order - very important, `Task['relations']['User'][0]` - vust be field in current entity, `Task['relations']['User'][1]` - must be field from related entity.
+`relations` argument order - very important, `Task['relations']['User'][0]` - must be field from current entity, `Task['relations']['User'][1]` - must be field from related entity.
 
 ## Events
 
