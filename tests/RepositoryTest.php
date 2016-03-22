@@ -37,9 +37,11 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
                 'assignee' => 'assignee',
                 'status' => 'status',
                 'type' => 'type',
-            ],
-            new Assets\EntityFactory('T4webInfrastructureTest\Assets\Task', 'ArrayObject')
+            ]
         );
+
+        $entityFactory = new Assets\EntityFactory('T4webInfrastructureTest\Assets\Task', 'ArrayObject');
+
         $config = new Config(
             [
                 'Task' => [
@@ -64,7 +66,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
             $criteriaFactory,
             $tableGateway,
             $mapper,
-            $config,
+            $entityFactory,
             $em
         );
     }

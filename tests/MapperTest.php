@@ -17,22 +17,18 @@ class MapperTest extends \PHPUnit_Framework_TestCase
      */
     private $columnsAsAttributesMap;
 
-    private $factoryMock;
-
     public function setUp()
     {
         $this->columnsAsAttributesMap = [
             'column' => 'attribute'
         ];
-        $this->factoryMock = $this->getMock('T4webDomainInterface\EntityFactoryInterface');
 
-        $this->mapper = new Mapper($this->columnsAsAttributesMap, $this->factoryMock);
+        $this->mapper = new Mapper($this->columnsAsAttributesMap);
     }
 
     public function testConstructor()
     {
         $this->assertAttributeEquals($this->columnsAsAttributesMap, 'columnsAsAttributesMap', $this->mapper);
-        $this->assertAttributeEquals($this->factoryMock, 'entityFactory', $this->mapper);
     }
 
     public function testToTableRow()
@@ -55,18 +51,11 @@ class MapperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider providerFromTableRow
      */
-    public function testFromTableRow($row, $expectedDataForFactory)
+    public function testFromTableRow($row, $expectedRow)
     {
-        $entityMock = $this->getMock('T4webDomainInterface\EntityInterface');
+        $result = $this->mapper->fromTableRow($row);
 
-        $this->factoryMock->expects($this->once())
-            ->method('create')
-            ->with($expectedDataForFactory)
-            ->will($this->returnValue($entityMock));
-
-        $entity = $this->mapper->fromTableRow($row);
-
-        $this->assertSame($entityMock, $entity);
+        $this->assertEquals($expectedRow, $result);
     }
 
     public function providerFromTableRow()
@@ -88,19 +77,12 @@ class MapperTest extends \PHPUnit_Framework_TestCase
         $rows = [
             ['column' => 'attribute value']
         ];
-        $expectedDataForFactory = [
+        $expectedRows = [
             ['attribute' => 'attribute value']
         ];
 
-        $entityMock = $this->getMock('T4webDomainInterface\EntityInterface');
+        $result = $this->mapper->fromTableRows($rows);
 
-        $this->factoryMock->expects($this->once())
-            ->method('createCollection')
-            ->with($expectedDataForFactory)
-            ->will($this->returnValue($entityMock));
-
-        $entity = $this->mapper->fromTableRows($rows);
-
-        $this->assertSame($entityMock, $entity);
+        $this->assertSame($expectedRows, $result);
     }
 }
