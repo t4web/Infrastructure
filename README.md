@@ -23,7 +23,7 @@ Add this project in your composer.json:
 
 ```json
 "require": {
-    "t4web/infrastructure": "~1.0.0"
+    "t4web/infrastructure": "~1.2.0"
 }
 ```
 
