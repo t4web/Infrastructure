@@ -72,7 +72,7 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   );
   ```
   
-- `Mapper` - for translate `Entity` to table row (array), and table row to `Entity`
+- `Mapper` - for translate `Entity` to table row (array), and filter table row according `columnsAsAttributesMap`
   ```php
   $columnsAsAttributesMap = [
       'id' => 'id',
@@ -90,8 +90,8 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
       'status' => 2,
       'type' => 1,
   ];
-  $mapper = new T4webInfrastructure\Mapper($columnsAsAttributesMap, new T4webDomainInterface\EntityFactoryInterface());
-  $entity = $mapper->fromTableRow($tableRow);
+  $mapper = new T4webInfrastructure\Mapper($columnsAsAttributesMap);
+  $filteredTableRow = $mapper->fromTableRow($tableRow);
   $tableRow = $mapper->toTableRow($entity);
   ```
 
@@ -115,6 +115,18 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   //        FROM `tasks`
   //        INNER JOIN `photos` ON `photos`.`task_id` = `tasks`.`id`
   //        WHERE `tasks`.id = 2 AND `photos`.`status` = 3
+  ```
+
+- `Repository` - for store entities and restore from storage
+  ```php
+  $repository = $serviceLocator->get('Task\Infrastructure\Repository');
+  /** @var Tasks\Task\Task $task */
+  $task = $repository->findById(123);
+
+  $repository = $serviceLocator->get('Task\Infrastructure\AggregateRepository');
+  $task = $repository->findWith('User')->findById(123);
+  /** @var Users\User\User $assignee */
+  $assignee = $task->getAssignee();
   ```
 
 ## Build criteria from array
