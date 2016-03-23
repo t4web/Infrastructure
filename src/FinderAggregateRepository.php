@@ -72,13 +72,19 @@ class FinderAggregateRepository implements RepositoryInterface
         $this->relationsConfig = $relationsConfig;
     }
 
-    public function findWith($entityName)
+    /**
+     * @param string $entityName
+     * @return $this
+     */
+    public function with($entityName)
     {
         if (!isset($this->relatedRepository[$entityName])) {
             throw new \RuntimeException(get_class($this) . ": related $entityName repository not exists");
         }
 
         $this->with[$entityName] = [];
+
+        return $this;
     }
 
     /**
