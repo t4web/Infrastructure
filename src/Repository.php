@@ -62,12 +62,18 @@ class Repository implements RepositoryInterface
     protected $event;
 
     /**
+     * @var string
+     */
+    protected $tablePrimaryKey;
+
+    /**
      * @param string                $entityName
      * @param CriteriaFactory       $criteriaFactory
      * @param TableGateway          $tableGateway
      * @param Mapper                $mapper
      * @param EntityFactoryInterface $entityFactory
      * @param EventManagerInterface $eventManager
+     * @param string $tablePrimaryKey
      */
     public function __construct(
         $entityName,
@@ -75,7 +81,8 @@ class Repository implements RepositoryInterface
         TableGateway $tableGateway,
         Mapper $mapper,
         EntityFactoryInterface $entityFactory,
-        EventManagerInterface $eventManager
+        EventManagerInterface $eventManager,
+        $tablePrimaryKey = 'id'
     ) {
 
         $this->entityName = $entityName;
@@ -86,6 +93,7 @@ class Repository implements RepositoryInterface
         $this->identityMap = new ArrayObject();
         $this->identityMapOriginal = new ArrayObject();
         $this->eventManager = $eventManager;
+        $this->tablePrimaryKey = $tablePrimaryKey;
     }
 
     /**
@@ -108,7 +116,7 @@ class Repository implements RepositoryInterface
 
             $this->triggerPreChanges($e);
 
-            $result = $this->tableGateway->update($this->mapper->toTableRow($entity), ['id' => $id]);
+            $result = $this->tableGateway->update($this->mapper->toTableRow($entity), [$this->tablePrimaryKey => $id]);
 
             $this->triggerChanges($e);
             $this->triggerAttributesChange($e);
@@ -119,7 +127,7 @@ class Repository implements RepositoryInterface
 
             if (empty($id)) {
                 $id = $this->tableGateway->getLastInsertValue();
-                $entity->populate(compact('id'));
+                $entity->populate([$this->tablePrimaryKey => $id]);
             }
 
             $this->toIdentityMap($entity);
@@ -142,7 +150,7 @@ class Repository implements RepositoryInterface
             return;
         }
 
-        return $this->tableGateway->delete(['id' => $id]);
+        return $this->tableGateway->delete([$this->tablePrimaryKey => $id]);
     }
 
     /**
@@ -177,7 +185,7 @@ class Repository implements RepositoryInterface
     public function findById($id)
     {
         $criteria = $this->createCriteria();
-        $criteria->equalTo('id', $id);
+        $criteria->equalTo($this->tablePrimaryKey, $id);
 
         return $this->find($criteria);
     }
