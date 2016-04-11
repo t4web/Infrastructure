@@ -127,7 +127,7 @@ class Repository implements RepositoryInterface
 
             if (empty($id)) {
                 $id = $this->tableGateway->getLastInsertValue();
-                $entity->populate([$this->tablePrimaryKey => $id]);
+                $entity->populate(compact('id'));
             }
 
             $this->toIdentityMap($entity);
