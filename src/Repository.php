@@ -185,7 +185,7 @@ class Repository implements RepositoryInterface
     public function findById($id)
     {
         $criteria = $this->createCriteria();
-        $criteria->equalTo($this->tablePrimaryKey, $id);
+        $criteria->equalTo('id', $id);
 
         return $this->find($criteria);
     }
