@@ -277,7 +277,7 @@ For many-to-many relation related entity must contain 3 arguments. For example w
 $eventManager = new EventManager();
 $eventManager->getSharedManager()->attach(
      'T4webInfrastructure\Repository',
-     ''entity:ModuleName\EntityName\EntityName:changed'',
+     'entity:ModuleName\EntityName\EntityName:changed',
      function(T4webInfrastructure\Event\EntityChangedEvent $e){
         $changedEntity = $e->getChangedEntity();
         $originalEntity = $e->getOriginalEntity();
