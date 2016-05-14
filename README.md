@@ -276,8 +276,8 @@ For many-to-many relation related entity must contain 3 arguments. For example w
 ```php
 $eventManager = new EventManager();
 $eventManager->getSharedManager()->attach(
-     'T4webInfrastructure\Repository',
-     'entity:ModuleName\EntityName\EntityName:changed',
+     REPOSITORY_IDENTIFIER,
+     'entity:ENTITY_CLASS:changed',
      function(T4webInfrastructure\Event\EntityChangedEvent $e){
         $changedEntity = $e->getChangedEntity();
         $originalEntity = $e->getOriginalEntity();
@@ -286,6 +286,10 @@ $eventManager->getSharedManager()->attach(
      $priority
 );
 ```
+
+Where `REPOSITORY_IDENTIFIER` - depends from entity, builds: EntityName\Infrastructure\Repository  
+`ENTITY_CLASS` - get_class() from you $enity object
+
 Now `Repository` can rise:
 - `entity:ModuleName\EntityName\EntityName:created` - rise after Entity just created in DB.
   In context event subscriber receive Zend\EventManager\Event.
