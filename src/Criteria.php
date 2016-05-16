@@ -13,6 +13,11 @@ class Criteria implements CriteriaInterface
     protected $entityName;
 
     /**
+     * @var array
+     */
+    protected $relations = [];
+
+    /**
      * @var Config
      */
     protected $config;
@@ -59,6 +64,10 @@ class Criteria implements CriteriaInterface
      */
     public function relation($entityName)
     {
+        if (isset($this->relations[$entityName])) {
+            return $this->relations[$entityName];
+        }
+
         if ($this->config->isRelationManyToMany($this->entityName, $entityName)) {
 
             list($linkTable,
@@ -91,6 +100,8 @@ class Criteria implements CriteriaInterface
         }
 
         $relationCriteria = new self($entityName, $this->config, $this->select);
+
+        $this->relations[$entityName] = $relationCriteria;
 
         return $relationCriteria;
     }
