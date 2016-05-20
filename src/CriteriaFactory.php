@@ -47,10 +47,11 @@ class CriteriaFactory
         $this->applyFilter($criteria, $filter);
 
         foreach ($relations as $relationEntity => $relationFilter) {
-            $relation = $criteria->relation($relationEntity);
-            $this->applyFilter($relation, $relationFilter);
+            if (!empty($relationFilter)) {
+                $relation = $criteria->relation($relationEntity);
+                $this->applyFilter($relation, $relationFilter);
+            }
         }
-
 
         return $criteria;
     }
