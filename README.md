@@ -123,7 +123,7 @@ This implementation build on [Zend\Db](https://github.com/zendframework/zend-db)
   /** @var Tasks\Task\Task $task */
   $task = $repository->findById(123);
 
-  $repository = $serviceLocator->get('Task\Infrastructure\AggregateRepository');
+  $repository = $serviceLocator->get('Task\Infrastructure\FinderAggregateRepository');
   $task = $repository->findWith('User')->findById(123);
   /** @var Users\User\User $assignee */
   $assignee = $task->getAssignee();
