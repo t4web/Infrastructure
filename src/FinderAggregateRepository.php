@@ -192,6 +192,10 @@ class FinderAggregateRepository implements RepositoryInterface
 
         $relatedEntities = [];
         foreach ($this->with as $relatedEntityName => $cascadeWith) {
+            if (empty((array)$relatedEntityIds[$relatedEntityName])) {
+                continue;
+            }
+            
             $criteria = $this->relatedRepository[$relatedEntityName]->createCriteria(['id.in' => (array)$relatedEntityIds[$relatedEntityName]]);
             $relatedEntities[$relatedEntityName] = $this->relatedRepository[$relatedEntityName]->findMany($criteria);
         }
