@@ -198,13 +198,13 @@ class FinderAggregateRepository implements RepositoryInterface
 
         $entitiesArgs = [];
         foreach ($rows as &$row) {
-            $relatedField = $this->getRelatedField($relatedEntityName);
-
             $entityArgs = [
                 'data' => $this->mapper->fromTableRow($row)
             ];
 
             foreach ($this->relationsConfig as $entityName => $joinRule) {
+                $relatedField = $this->getRelatedField($entityName);
+                
                 if (isset($relatedEntities[$entityName])) {
                     if (isset($relatedEntities[$entityName][$row[$relatedField]])) {
                         $entityArgs['aggregateItems'][] = $relatedEntities[$entityName][$row[$relatedField]];
