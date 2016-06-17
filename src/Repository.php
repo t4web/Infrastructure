@@ -150,7 +150,11 @@ class Repository implements RepositoryInterface
             return;
         }
 
-        return $this->tableGateway->delete([$this->tablePrimaryKey => $id]);
+        $result = $this->tableGateway->delete([$this->tablePrimaryKey => $id]);
+
+        $this->triggerDelete($entity);
+
+        return $result;
     }
 
     /**
@@ -294,6 +298,21 @@ class Repository implements RepositoryInterface
         if ($event->getParam('entity') && $event->getParam('entity') instanceof EntityInterface) {
             $createdEntity = $event->getParam('entity');
         }
+    }
+
+    /**
+     * @param EntityInterface $deletedEntity
+     */
+    protected function triggerDelete(EntityInterface $deletedEntity)
+    {
+        $this->eventManager->addIdentifiers(get_class($deletedEntity));
+
+        $event = new Event(
+            sprintf('entity:%s:deleted', get_class($deletedEntity)),
+            $this,
+            ['entity' => $deletedEntity]
+        );
+        $this->eventManager->trigger($event);
     }
 
     /**
