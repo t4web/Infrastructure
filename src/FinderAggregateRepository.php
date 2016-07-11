@@ -176,6 +176,7 @@ class FinderAggregateRepository implements RepositoryInterface
 
         $rows = $this->tableGateway->selectWith($select)->toArray();
 
+        $relatedEntityIds = [];
         foreach ($rows as $row) {
             foreach ($this->with as $relatedEntityName => $cascadeWith) {
                 $relatedField = $this->getRelatedField($relatedEntityName);
