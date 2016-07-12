@@ -175,6 +175,10 @@ class FinderAggregateRepository implements RepositoryInterface
         $select = $criteria->getQuery();
 
         $rows = $this->tableGateway->selectWith($select)->toArray();
+        
+        if (empty($rows)) {
+            return [];
+        }
 
         $relatedEntityIds = [];
         foreach ($rows as $row) {
