@@ -113,7 +113,7 @@ class FinderAggregateRepository implements RepositoryInterface
         foreach ($this->with as $relatedEntityName => $cascadeWith) {
             $relatedField = $this->getRelatedField($relatedEntityName);
 
-            if (!isset($row[$relatedField])) {
+            if (!array_key_exists($relatedField, $row)) {
                 throw new \RuntimeException(get_class($this) . ": relation field $relatedEntityName not fetched");
             }
 
@@ -185,7 +185,7 @@ class FinderAggregateRepository implements RepositoryInterface
             foreach ($this->with as $relatedEntityName => $cascadeWith) {
                 $relatedField = $this->getRelatedField($relatedEntityName);
 
-                if (!isset($row[$relatedField])) {
+                if (!array_key_exists($relatedField, $row)) {
                     throw new \RuntimeException(get_class($this) . ": relation field $relatedEntityName not fetched");
                 }
 
