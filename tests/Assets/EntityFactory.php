@@ -18,7 +18,19 @@ class EntityFactory implements EntityFactoryInterface
 
     public function create(array $data)
     {
-        return new $this->entityClass($data);
+        if (!isset($data['data']) && !isset($data['aggregateItems'])) {
+            return new $this->entityClass($data);
+        }
+
+        $reflector = new \ReflectionClass($this->entityClass);
+
+        $istanceArgs = [$data['data']];
+
+        foreach ($data['aggregateItems'] as $aggregateItem) {
+            $istanceArgs[] = $aggregateItem;
+        }
+
+        return $reflector->newInstanceArgs($istanceArgs);
     }
 
     public function createCollection(array $data)

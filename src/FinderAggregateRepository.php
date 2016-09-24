@@ -88,11 +88,15 @@ class FinderAggregateRepository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $criteria
+     * @param CriteriaInterface|array $criteria
      * @return EntityInterface|null
      */
     public function find($criteria)
     {
+        if (is_array($criteria)) {
+            $criteria = $this->createCriteria($criteria);
+        }
+
         if (empty($this->with)) {
             return $this->entityRepository->find($criteria);
         }
@@ -162,11 +166,15 @@ class FinderAggregateRepository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $criteria
+     * @param CriteriaInterface|array $criteria
      * @return EntityInterface[]
      */
     public function findMany($criteria)
     {
+        if (is_array($criteria)) {
+            $criteria = $this->createCriteria($criteria);
+        }
+
         if (empty($this->with)) {
             return $this->entityRepository->findMany($criteria);
         }

@@ -97,6 +97,16 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($id, $entity->getId());
     }
 
+    public function testFindRowByCriteriaArrayExists()
+    {
+        $id = 2;
+
+        $entity = $this->repository->find(['id_equalTo' => $id]);
+
+        $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
+        $this->assertEquals($id, $entity->getId());
+    }
+
     public function testFindRowNotExists()
     {
         $id = 1;
@@ -137,6 +147,15 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(1, $count);
     }
 
+    public function testCountByCriteriaArray()
+    {
+        $id = 2;
+
+        $count = $this->repository->count(['id_equalTo' => $id]);
+
+        $this->assertEquals(1, $count);
+    }
+
     public function testFindManyRowExists()
     {
         $id = 2;
@@ -144,6 +163,16 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
         $criteria->equalTo('id', $id);
 
         $entities = $this->repository->findMany($criteria);
+
+        $this->assertInstanceOf('ArrayObject', $entities);
+        $this->assertEquals($id, $entities[$id]->getId());
+    }
+
+    public function testFindManyRowByCriteriaArrayExists()
+    {
+        $id = 2;
+
+        $entities = $this->repository->findMany(['id_equalTo' => $id]);
 
         $this->assertInstanceOf('ArrayObject', $entities);
         $this->assertEquals($id, $entities[$id]->getId());
