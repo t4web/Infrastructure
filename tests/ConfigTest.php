@@ -3,6 +3,7 @@
 namespace T4webDomainTest;
 
 use T4webInfrastructure\Config;
+use T4webInfrastructure\ConfigException;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,6 +24,8 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
             'Task' => [
                 'table' => 'tasks',
                 'entityClass' => 'Tasks\Task\Task',
+                'primaryKey' => 'id',
+                'sequence' => 'id_sequence',
                 'columnsAsAttributesMap' => [
                     'id' => 'id',
                     'projectId' => 'project_id',
@@ -34,6 +37,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'relations' => [
                     'User' => ['tasks.assignee_id', 'user.id'],
                     'Tag' => ['tasks_tags_link', 'task_id', 'tag_id'],
+                    'Bad' => [],
                 ],
                 'criteriaMap' => [
                     'id' => 'id_equalTo',
@@ -56,11 +60,35 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entityMap['Task']['table'], $table);
     }
 
+    public function testGetTableException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $table = $this->config->getTable('User');
+    }
+
     public function testGetEntityClass()
     {
         $entityClass = $this->config->getEntityClass('Task');
 
         $this->assertEquals($this->entityMap['Task']['entityClass'], $entityClass);
+    }
+
+    public function testGetEntityClassException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $entityClass = $this->config->getEntityClass('User');
+    }
+
+    public function testGetFieldException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->getFiled('User', 'name');
+    }
+
+    public function testGetFieldNotExistsException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->getFiled('Task', 'amount');
     }
 
     public function testGetRelationExpression()
@@ -70,10 +98,28 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('tasks.assignee_id = user.id', $joinOn);
     }
 
+    public function testGetRelationExpressionException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $joinOn = $this->config->getRelationExpression('Task', 'Statistic');
+    }
+
+    public function testGetRelationExpressionBadException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $joinOn = $this->config->getRelationExpression('Task', 'Bad');
+    }
+
     public function testIsRelationManyToMany()
     {
         $this->assertFalse($this->config->isRelationManyToMany('Task', 'User'));
         $this->assertTrue($this->config->isRelationManyToMany('Task', 'Tag'));
+    }
+
+    public function testIsRelationManyToManyException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->isRelationManyToMany('Task', 'Statistic');
     }
 
     public function testGetRelationManyToMany()
@@ -85,6 +131,12 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('tag_id', $joinOn2);
     }
 
+    public function testGetRelationManyToManyException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->getRelationManyToMany('Task', 'Statistic');
+    }
+
     public function testGetColumnsAsAttributesMap()
     {
         $columnsMap = $this->config->getColumnsAsAttributesMap('Task');
@@ -92,10 +144,31 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($this->entityMap['Task']['columnsAsAttributesMap'], $columnsMap);
     }
 
+    public function testGetColumnsAsAttributesMapException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->getColumnsAsAttributesMap('Bad');
+    }
+
     public function testGetCriteriaMap()
     {
         $criteriaMap = $this->config->getCriteriaMap('Task');
 
         $this->assertEquals($this->entityMap['Task']['criteriaMap'], $criteriaMap);
+    }
+
+    public function testGetPrimaryKey()
+    {
+        $this->assertEquals($this->entityMap['Task']['primaryKey'], $this->config->getPrimaryKey('Task'));
+    }
+
+    public function testGetSequence()
+    {
+        $this->assertEquals($this->entityMap['Task']['sequence'], $this->config->getSequence('Task'));
+    }
+
+    public function testGetNamespace()
+    {
+        $this->assertEquals('Tasks\Task', $this->config->getNamespace('Task'));
     }
 }
