@@ -173,7 +173,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
 
-        $entity->populate(['name' => date('His'), 'assignee' => date('is')]);
+        $entity->populate(['name' => date('His'), 'assignee' => 'MA']);
 
         $rowsAffected = $this->repository->add($entity);
 
