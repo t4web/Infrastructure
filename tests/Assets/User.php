@@ -4,21 +4,14 @@ namespace T4webInfrastructureTest\Assets;
 
 use T4webDomainInterface\EntityInterface;
 
-class Task implements EntityInterface
+class User implements EntityInterface
 {
     protected $id;
     protected $name;
-    protected $assignee;
 
-    /**
-     * @var User
-     */
-    protected $assigneeUser;
-
-    public function __construct(array $data = [], User $assigneeUser = null)
+    public function __construct(array $data = [])
     {
         $this->populate($data);
-        $this->assigneeUser = $assigneeUser;
     }
 
     public function getId()
@@ -27,11 +20,11 @@ class Task implements EntityInterface
     }
 
     /**
-     * @return User
+     * @return mixed
      */
-    public function getAssigneeUser()
+    public function getName()
     {
-        return $this->assigneeUser;
+        return $this->name;
     }
 
     public function extract(array $properties = [])

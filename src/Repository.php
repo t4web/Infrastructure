@@ -158,11 +158,15 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $criteria
+     * @param CriteriaInterface|array $criteria
      * @return EntityInterface|null
      */
     public function find($criteria)
     {
+        if (is_array($criteria)) {
+            $criteria = $this->createCriteria($criteria);
+        }
+
         /** @var Select $select */
         $select = $criteria->getQuery();
 
@@ -195,11 +199,15 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $criteria
+     * @param CriteriaInterface|array $criteria
      * @return EntityInterface[]
      */
     public function findMany($criteria)
     {
+        if (is_array($criteria)) {
+            $criteria = $this->createCriteria($criteria);
+        }
+
         /** @var Select $select */
         $select = $criteria->getQuery();
 
@@ -217,11 +225,15 @@ class Repository implements RepositoryInterface
     }
 
     /**
-     * @param mixed $criteria
+     * @param CriteriaInterface|array $criteria
      * @return int
      */
     public function count($criteria)
     {
+        if (is_array($criteria)) {
+            $criteria = $this->createCriteria($criteria);
+        }
+
         /** @var Select $select */
         $select = $criteria->getQuery();
         $select->columns(["row_count" => new Expression("COUNT(*)")]);
