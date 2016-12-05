@@ -29,7 +29,7 @@ class Config
 
     /**
      * @param string $entityName
-     * @return string mixed
+     * @return string
      */
     public function getEntityClass($entityName)
     {
@@ -38,6 +38,19 @@ class Config
         }
 
         return $this->entityMap[$entityName]['entityClass'];
+    }
+    
+    /**
+     * @param string $entityName
+     * @return string
+     */
+    public function getCollectionClass($entityName)
+    {
+        if (!isset($this->entityMap[$entityName]['collectionClass'])) {
+            return 'ArrayObject';
+        }
+
+        return $this->entityMap[$entityName]['collectionClass'];
     }
 
     /**
