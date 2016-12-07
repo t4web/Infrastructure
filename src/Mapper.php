@@ -13,10 +13,12 @@ class Mapper
 
     /**
      * @param array $columnsAsAttributesMap
+     * @param array $serialized
      */
-    public function __construct(array $columnsAsAttributesMap)
+    public function __construct(array $columnsAsAttributesMap, array $serialized = [])
     {
         $this->columnsAsAttributesMap = $columnsAsAttributesMap;
+        $this->serialized = $serialized;
     }
 
     /**
@@ -31,7 +33,11 @@ class Mapper
             unset($objectState['id']);
         }
 
-        return $this->getIntersectValuesAsKeys($this->columnsAsAttributesMap, $objectState);
+        $row = $this->getIntersectValuesAsKeys($this->columnsAsAttributesMap, $objectState);
+
+        $row = $this->serialize($row);
+
+        return $row;
     }
 
     /**
@@ -40,6 +46,8 @@ class Mapper
      */
     public function fromTableRow(array $row)
     {
+        $row = $this->serialize($row, false);
+        
         $attributesValues = $this->getIntersectValuesAsKeys(array_flip($this->columnsAsAttributesMap), $row);
 
         return $attributesValues;
@@ -75,5 +83,23 @@ class Mapper
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $row
+     * @param bool $serialize
+     * @return array
+     */
+    private function serialize(array $row, $serialize = true)
+    {
+        foreach ($this->serialized as $column => $serializer) {
+            if (isset($row[$column])) {
+                if ($serializer == 'json') {
+                    $row[$column] = $serialize ? json_encode($row[$column], true) : json_decode($row[$column], true);
+                }
+            }
+        }
+
+        return $row;
     }
 }

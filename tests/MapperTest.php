@@ -85,4 +85,38 @@ class MapperTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($expectedRows, $result);
     }
+
+    public function testToTableRowSerialized()
+    {
+        $data = [
+            'value' => ['foo' => 'bar']
+        ];
+        
+        $entityMock = $this->getMock('T4webDomainInterface\EntityInterface');
+        $entityMock->expects($this->once())
+            ->method('extract')
+            ->with(['attribute'])
+            ->will($this->returnValue(['attribute' => $data]));
+
+        $mapper = new Mapper($this->columnsAsAttributesMap, ['column' => 'json']);
+        $actualTableRow = $mapper->toTableRow($entityMock);
+
+        $expectedTableRow = [
+            'column' => json_encode($data)
+        ];
+
+        $this->assertEquals($expectedTableRow, $actualTableRow);
+    }
+
+    public function testFromTableRowSerialized()
+    {
+        $data = [
+            'value' => ['foo' => 'bar']
+        ];
+
+        $mapper = new Mapper($this->columnsAsAttributesMap, ['column' => 'json']);
+        $result = $mapper->fromTableRow(['column' => json_encode($data)]);
+
+        $this->assertEquals(['attribute' => $data], $result);
+    }
 }
