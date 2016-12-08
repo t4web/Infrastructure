@@ -33,6 +33,7 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                     'assigneeId' => 'assignee_id',
                     'status' => 'status',
                     'type' => 'type',
+                    'extras' => 'extras',
                 ],
                 'relations' => [
                     'User' => ['tasks.assignee_id', 'user.id'],
@@ -42,7 +43,13 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
                 'criteriaMap' => [
                     'id' => 'id_equalTo',
                 ],
+                'serializedColumns' => [
+                    'extras' => 'json'
+                ],
             ],
+            'Bad' => [
+                'serializedColumns' => 'invalid'
+            ]
         ];
 
         $this->config = new Config($this->entityMap);
@@ -148,6 +155,24 @@ class ConfigTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(ConfigException::class);
         $this->config->getColumnsAsAttributesMap('Bad');
+    }
+
+    public function testGetSerializedColumns()
+    {
+        $serializedColumns = $this->config->getSerializedColumns('Task');
+
+        $this->assertEquals($this->entityMap['Task']['serializedColumns'], $serializedColumns);
+    }
+
+    public function testGetSerializedColumnsNotFound()
+    {
+        $this->assertEquals([], $this->config->getSerializedColumns('Bad2'));
+    }
+
+    public function testGetSerializedColumnsException()
+    {
+        $this->setExpectedException(ConfigException::class);
+        $this->config->getSerializedColumns('Bad');
     }
 
     public function testGetCriteriaMap()

@@ -182,6 +182,26 @@ class Config
 
     /**
      * @param string $entityName
+     *
+     * @return array
+     */
+    public function getSerializedColumns($entityName)
+    {
+        if (!isset($this->entityMap[$entityName]['serializedColumns'])) {
+            return [];
+        }
+
+        if (!is_array($this->entityMap[$entityName]['serializedColumns'])) {
+            throw new ConfigException(
+                sprintf("entity_map[serializedColumns] for %s must be array", $entityName)
+            );
+        }
+
+        return $this->entityMap[$entityName]['serializedColumns'];
+    }
+
+    /**
+     * @param string $entityName
      * @return string|null
      */
     public function getPrimaryKey($entityName)
