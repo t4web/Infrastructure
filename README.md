@@ -243,6 +243,7 @@ $entityMapConfig = [
             'assignee_id' => 'assigneeId',
             'status' => 'status',
             'type' => 'type',
+            'extras' => 'extras',
         ],
         
         // foreign relation
@@ -261,6 +262,11 @@ $entityMapConfig = [
         'criteriaMap' => [
             // alias => criteria
             'date_more' => 'dateCreate.greaterThan',
+        ],
+        
+        // for serializing persisting data 
+        'serializedColumns' => [
+            'extras' => 'json',
         ],
     ],
 ]
