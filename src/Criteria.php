@@ -29,6 +29,8 @@ class Criteria implements CriteriaInterface
 
     /**
      * @param string $entityName
+     * @param Config $config
+     * @param Select $select
      */
     public function __construct($entityName, Config $config, Select $select = null)
     {

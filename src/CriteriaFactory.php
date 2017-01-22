@@ -34,6 +34,32 @@ class CriteriaFactory
 
         $criteria = new Criteria($entityName, $this->config);
 
+        return $this->prepare($filter, $criteria);
+    }
+
+    /**
+     * @param string $entityName
+     * @param array $filter
+     * @return CriteriaInterface
+     */
+    public function buildInMemory($entityName, array $filter = [])
+    {
+        if (!is_string($entityName)) {
+            throw new RuntimeException(sprintf('Entity mame must be string, %s given', gettype($entityName)));
+        }
+
+        $criteria = new InMemoryCriteria($entityName);
+
+        return $this->prepare($filter, $criteria);
+    }
+
+    /**
+     * @param array $filter
+     * @param CriteriaInterface $criteria
+     * @return CriteriaInterface
+     */
+    protected function prepare(array $filter, $criteria)
+    {
         if (empty($filter)) {
             return $criteria;
         }

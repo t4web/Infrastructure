@@ -27,6 +27,14 @@ class Task implements EntityInterface
     }
 
     /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
      * @return User
      */
     public function getAssigneeUser()
