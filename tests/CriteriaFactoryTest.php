@@ -3,6 +3,7 @@
 namespace T4webInfrastructureTest;
 
 use T4webInfrastructure\CriteriaFactory;
+use T4webInfrastructure\InMemoryCriteria;
 use T4webInfrastructure\Config;
 
 class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
@@ -116,5 +117,20 @@ class CriteriaFactoryTest extends \PHPUnit_Framework_TestCase
                 'limit' => 5
             ]
         );
+    }
+
+    public function testBuildInMemoryCriteria()
+    {
+        $criteria = $this->criteriaFactory->buildInMemory(
+            'Task',
+            [
+                'date_more' => '2015-10-30',
+                'id_isNotNull' => true,
+                'dateCreate_between' => ['2015-10-30', '2015-10-31'],
+            ]
+        );
+
+        $this->assertInstanceOf(InMemoryCriteria::class, $criteria);
+        $this->assertEquals('Task', $criteria->getEntityName());
     }
 }

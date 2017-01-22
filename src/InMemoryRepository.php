@@ -3,9 +3,6 @@
 namespace T4webInfrastructure;
 
 use ArrayObject;
-use Zend\Db\TableGateway\TableGateway;
-use Zend\Db\Sql\Select;
-use Zend\Db\Sql\Expression;
 use Zend\EventManager\EventManagerInterface;
 use Zend\EventManager\Event;
 use T4webDomainInterface\Infrastructure\CriteriaInterface;
@@ -14,7 +11,7 @@ use T4webDomainInterface\EntityInterface;
 use T4webDomainInterface\EntityFactoryInterface;
 use T4webInfrastructure\Event\EntityChangedEvent;
 
-class Repository implements RepositoryInterface
+class InMemoryRepository implements RepositoryInterface
 {
     /**
      * @var string
@@ -25,16 +22,6 @@ class Repository implements RepositoryInterface
      * @var CriteriaFactory
      */
     protected $criteriaFactory;
-
-    /**
-     * @var TableGateway
-     */
-    protected $tableGateway;
-
-    /**
-     * @var Mapper
-     */
-    protected $mapper;
 
     /**
      * @var EntityFactoryInterface
@@ -61,39 +48,26 @@ class Repository implements RepositoryInterface
      */
     protected $event;
 
-    /**
-     * @var string
-     */
-    protected $tablePrimaryKey;
+    protected $primaryKey = 1;
 
     /**
-     * @param string                $entityName
-     * @param CriteriaFactory       $criteriaFactory
-     * @param TableGateway          $tableGateway
-     * @param Mapper                $mapper
+     * @param string $entityName
+     * @param CriteriaFactory $criteriaFactory
      * @param EntityFactoryInterface $entityFactory
      * @param EventManagerInterface $eventManager
-     * @param string $tablePrimaryKey
      */
     public function __construct(
         $entityName,
         CriteriaFactory $criteriaFactory,
-        TableGateway $tableGateway,
-        Mapper $mapper,
         EntityFactoryInterface $entityFactory,
-        EventManagerInterface $eventManager,
-        $tablePrimaryKey = 'id'
+        EventManagerInterface $eventManager
     ) {
-
         $this->entityName = $entityName;
         $this->criteriaFactory = $criteriaFactory;
-        $this->tableGateway = $tableGateway;
-        $this->mapper = $mapper;
         $this->entityFactory = $entityFactory;
         $this->identityMap = new ArrayObject();
         $this->identityMapOriginal = new ArrayObject();
         $this->eventManager = $eventManager;
-        $this->tablePrimaryKey = $tablePrimaryKey;
     }
 
     /**
@@ -105,10 +79,6 @@ class Repository implements RepositoryInterface
         $id = $entity->getId();
 
         if ($this->identityMap->offsetExists((int)$id)) {
-            if (!$this->isEntityChanged($entity)) {
-                return;
-            }
-
             $e = $this->getEvent();
             $originalEntity = $this->identityMapOriginal->offsetGet($entity->getId());
             $e->setOriginalEntity($originalEntity);
@@ -116,17 +86,15 @@ class Repository implements RepositoryInterface
 
             $this->triggerPreChanges($e);
 
-            $result = $this->tableGateway->update($this->mapper->toTableRow($entity), [$this->tablePrimaryKey => $id]);
+            $this->toIdentityMap($entity);
 
             $this->triggerChanges($e);
             $this->triggerAttributesChange($e);
 
-            return $result;
+            return 1;
         } else {
-            $this->tableGateway->insert($this->mapper->toTableRow($entity));
-
             if (empty($id)) {
-                $id = $this->tableGateway->getLastInsertValue();
+                $id = $this->primaryKey++;
                 $entity->populate(compact('id'));
             }
 
@@ -146,11 +114,12 @@ class Repository implements RepositoryInterface
     {
         $id = $entity->getId();
 
-        if (empty($id)) {
-            return;
+        if ($this->identityMap->offsetExists((int)$id)) {
+            $this->identityMap->offsetUnset($id);
+            $result = 1;
+        } else {
+            $result = 0;
         }
-
-        $result = $this->tableGateway->delete([$this->tablePrimaryKey => $id]);
 
         $this->triggerDelete($entity);
 
@@ -167,19 +136,21 @@ class Repository implements RepositoryInterface
             $criteria = $this->createCriteria($criteria);
         }
 
-        /** @var Select $select */
-        $select = $criteria->getQuery();
+        $callback = $criteria->getQuery();
 
-        $select->limit(1)->offset(0);
-        $result = $this->tableGateway->selectWith($select)->toArray();
+        $result = null;
+        /** @var EntityInterface $entity */
+        foreach ($this->identityMap as $entity) {
+            if ($callback($entity->extract())) {
+                $result = $entity;
+            }
+        }
 
-        if (!isset($result[0])) {
+        if (is_null($result)) {
             return;
         }
 
-        $attributesValues = $this->mapper->fromTableRow($result[0]);
-
-        $entity = $this->entityFactory->create($attributesValues);
+        $entity = $result;
 
         $this->toIdentityMap($entity);
 
@@ -208,14 +179,15 @@ class Repository implements RepositoryInterface
             $criteria = $this->createCriteria($criteria);
         }
 
-        /** @var Select $select */
-        $select = $criteria->getQuery();
+        $callback = $criteria->getQuery();
 
-        $rows = $this->tableGateway->selectWith($select)->toArray();
-
-        $attributesValues = $this->mapper->fromTableRows($rows);
-
-        $entities = $this->entityFactory->createCollection($attributesValues);
+        $entities = new ArrayObject();
+        /** @var EntityInterface $entity */
+        foreach ($this->identityMap as $entity) {
+            if ($callback($entity->extract())) {
+                $entities->offsetSet($entity->getId(), $entity);
+            }
+        }
 
         foreach ($entities as $entity) {
             $this->toIdentityMap($entity);
@@ -234,22 +206,10 @@ class Repository implements RepositoryInterface
             $criteria = $this->createCriteria($criteria);
         }
 
-        /** @var Select $select */
-        $select = $criteria->getQuery();
-        $select->columns(["row_count" => new Expression("COUNT(*)")]);
+        /** @var ArrayObject $entities */
+        $entities = $this->findMany($criteria);
 
-        $select->reset('limit');
-        $select->reset('offset');
-        $select->reset('order');
-        $select->reset('group');
-
-        $result = $this->tableGateway->selectWith($select)->toArray();
-
-        if (!isset($result[0])) {
-            return 0;
-        }
-
-        return $result[0]['row_count'];
+        return $entities->count();
     }
 
     /**
@@ -258,7 +218,7 @@ class Repository implements RepositoryInterface
      */
     public function createCriteria(array $filter = [])
     {
-        return $this->criteriaFactory->build($this->entityName, $filter);
+        return $this->criteriaFactory->buildInMemory($this->entityName, $filter);
     }
 
     /**
