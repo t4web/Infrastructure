@@ -49,6 +49,7 @@ class InMemoryRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->repository = new InMemoryRepository(
             'Task',
+            'ArrayObject',
             $criteriaFactory,
             $entityFactory,
             $this->em
