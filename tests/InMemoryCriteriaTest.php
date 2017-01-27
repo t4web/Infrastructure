@@ -22,9 +22,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->equalTo('id', 2);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(1, $result);
         $this->assertArrayHasKey(2, $result);
@@ -35,9 +35,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->notEqualTo('id', 2);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(3, $result);
@@ -49,9 +49,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->lessThan('id', 3);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(1, $result);
         $this->assertArrayHasKey(2, $result);
@@ -62,9 +62,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->greaterThan('id', 3);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(1, $result);
         $this->assertArrayHasKey(4, $result);
@@ -75,9 +75,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->greaterThanOrEqualTo('id', 3);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(3, $result);
@@ -89,9 +89,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->lessThanOrEqualTo('id', 3);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(2, $result);
@@ -103,9 +103,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->like('name', 'a');
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(2, $result);
@@ -119,9 +119,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->isNull('lastName');
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(1, $result);
         $this->assertArrayHasKey(2, $result);
@@ -132,9 +132,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->isNotNull('lastName');
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(3, $result);
@@ -146,9 +146,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->in('id', [3, 4]);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(3, $result);
@@ -160,9 +160,9 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria = new InMemoryCriteria('User');
         $criteria->between('id', 3, 4);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(2, $result);
         $this->assertArrayHasKey(3, $result);
@@ -182,19 +182,29 @@ class InMemoryCriteriaTest extends \PHPUnit_Framework_TestCase
         $criteria->in('id', [2, 3, 4]);
         $criteria->between('id', 1, 22);
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $result = $this->applyCriteria($callback);
+        $result = $this->applyCriteria($callbacks);
 
         $this->assertCount(1, $result);
         $this->assertArrayHasKey(4, $result);
     }
 
-    private function applyCriteria($callback)
+    private function applyCriteria($callbacks)
     {
         $result = [];
         foreach ($this->entities as $entity) {
-            if ($callback($entity)) {
+
+            $isSatisfied = true;
+
+            foreach ($callbacks as $callback) {
+                if (!$callback($entity)) {
+                    $isSatisfied = false;
+                    break 1;
+                }
+            }
+
+            if ($isSatisfied) {
                 $result[$entity['id']] = $entity;
             }
         }
