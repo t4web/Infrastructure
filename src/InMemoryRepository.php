@@ -19,6 +19,11 @@ class InMemoryRepository implements RepositoryInterface
     protected $entityName;
 
     /**
+     * @var string
+     */
+    protected $collectionClass;
+
+    /**
      * @var CriteriaFactory
      */
     protected $criteriaFactory;
@@ -52,17 +57,20 @@ class InMemoryRepository implements RepositoryInterface
 
     /**
      * @param string $entityName
+     * @param string $collectionClass
      * @param CriteriaFactory $criteriaFactory
      * @param EntityFactoryInterface $entityFactory
      * @param EventManagerInterface $eventManager
      */
     public function __construct(
         $entityName,
+        $collectionClass,
         CriteriaFactory $criteriaFactory,
         EntityFactoryInterface $entityFactory,
         EventManagerInterface $eventManager
     ) {
         $this->entityName = $entityName;
+        $this->collectionClass = $collectionClass;
         $this->criteriaFactory = $criteriaFactory;
         $this->entityFactory = $entityFactory;
         $this->identityMap = new ArrayObject();
@@ -136,13 +144,25 @@ class InMemoryRepository implements RepositoryInterface
             $criteria = $this->createCriteria($criteria);
         }
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
         $result = null;
         /** @var EntityInterface $entity */
         foreach ($this->identityMap as $entity) {
-            if ($callback($entity->extract())) {
+
+            $data = $entity->extract();
+            $isSatisfied = true;
+
+            foreach ($callbacks as $callback) {
+                if (!$callback($data)) {
+                    $isSatisfied = false;
+                    break 1;
+                }
+            }
+
+            if ($isSatisfied) {
                 $result = $entity;
+                break;
             }
         }
 
@@ -179,12 +199,24 @@ class InMemoryRepository implements RepositoryInterface
             $criteria = $this->createCriteria($criteria);
         }
 
-        $callback = $criteria->getQuery();
+        $callbacks = $criteria->getQuery();
 
-        $entities = new ArrayObject();
+        $entities = new $this->collectionClass;
+
         /** @var EntityInterface $entity */
         foreach ($this->identityMap as $entity) {
-            if ($callback($entity->extract())) {
+
+            $data = $entity->extract();
+            $isSatisfied = true;
+
+            foreach ($callbacks as $callback) {
+                if (!$callback($data)) {
+                    $isSatisfied = false;
+                    break 1;
+                }
+            }
+
+            if ($isSatisfied) {
                 $entities->offsetSet($entity->getId(), $entity);
             }
         }
