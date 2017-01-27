@@ -28,18 +28,9 @@ class InMemoryCriteria implements CriteriaInterface
     /**
      * @return mixed
      */
-    public function getQuery()
+    public function &getQuery()
     {
-        $callbacks = $this->callbacks;
-        return function(array $data) use ($callbacks) {
-            foreach ($callbacks as $callback) {
-                if (!$callback($data)) {
-                    return false;
-                }
-            }
-
-            return true;
-        };
+        return $this->callbacks;
     }
 
     /**
@@ -290,7 +281,7 @@ class InMemoryCriteria implements CriteriaInterface
             if (!array_key_exists($attribute, $data)) {
                 return false;
             }
-            
+
             if ($data[$attribute] >= $minValue && $data[$attribute] <= $maxValue) {
                 return true;
             }
