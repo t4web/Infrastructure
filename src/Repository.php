@@ -333,6 +333,9 @@ class Repository implements RepositoryInterface
     protected function triggerChanges(EntityChangedEvent $e)
     {
         $changedEntity = $e->getChangedEntity();
+
+        $this->eventManager->addIdentifiers(get_class($changedEntity));
+
         $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity), $this, $e);
     }
 
@@ -342,6 +345,9 @@ class Repository implements RepositoryInterface
     protected function triggerPreChanges(EntityChangedEvent $e)
     {
         $changedEntity = $e->getChangedEntity();
+
+        $this->eventManager->addIdentifiers(get_class($changedEntity));
+
         $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity).':pre', $this, $e);
     }
 
@@ -351,6 +357,8 @@ class Repository implements RepositoryInterface
     protected function triggerAttributesChange(EntityChangedEvent $e)
     {
         $changedEntity = $e->getChangedEntity();
+
+        $this->eventManager->addIdentifiers(get_class($changedEntity));
 
         $originalAttrs = $e->getOriginalEntity()->extract();
         $changedAttrs = $changedEntity->extract();
