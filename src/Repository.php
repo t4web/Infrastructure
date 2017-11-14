@@ -95,7 +95,7 @@ class Repository implements RepositoryInterface
     {
         $id = $entity->getId();
 
-        if ($this->identityMap->offsetExists((int)$id)) {
+        if (!is_null($id) && $this->identityMap->offsetExists((int)$id)) {
             if (!$this->isEntityChanged($entity)) {
                 return;
             }
