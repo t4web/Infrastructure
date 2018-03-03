@@ -6,7 +6,7 @@ use T4webInfrastructure\CriteriaFactory;
 use T4webInfrastructure\InMemoryRepository;
 use T4webInfrastructure\Event\EntityChangedEvent;
 use Zend\EventManager\EventManager;
-use Zend\EventManager\StaticEventManager;
+use Zend\EventManager\SharedEventManager;
 use Zend\EventManager\Event;
 use T4webInfrastructure\Config;
 
@@ -43,9 +43,8 @@ class InMemoryRepositoryTest extends \PHPUnit_Framework_TestCase
             ]
         );
         $criteriaFactory = new CriteriaFactory($config);
-        StaticEventManager::getInstance();
-        $this->em = new EventManager();
-        $this->em->addIdentifiers('Task\Infrastructure\InMemoryRepository');
+        $this->em = new EventManager(new SharedEventManager());
+        $this->em->addIdentifiers(['Task\Infrastructure\InMemoryRepository']);
 
         $this->repository = new InMemoryRepository(
             'Task',

@@ -180,7 +180,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
     public function testAddInsert()
     {
-        $newEntity = $this->repository->add(new Assets\Task(['name' => 'Some name', 'assignee' => 'AA']));
+        $newEntity = $this->repository->add(new Assets\Task(['name' => 'Some name', 'assignee' => 2]));
 
         $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $newEntity);
 
@@ -202,7 +202,7 @@ class RepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('T4webInfrastructureTest\Assets\Task', $entity);
 
-        $entity->populate(['name' => date('His'), 'assignee' => 'MA']);
+        $entity->populate(['name' => date('His'), 'assignee' => 1]);
 
         $rowsAffected = $this->repository->add($entity);
 

@@ -298,14 +298,14 @@ class Repository implements RepositoryInterface
      */
     protected function triggerCreate(EntityInterface &$createdEntity)
     {
-        $this->eventManager->addIdentifiers(get_class($createdEntity));
+        $this->eventManager->addIdentifiers([get_class($createdEntity)]);
 
         $event = new Event(
             sprintf('entity:%s:created', get_class($createdEntity)),
             $this,
             ['entity' => $createdEntity]
         );
-        $this->eventManager->trigger($event);
+        $this->eventManager->triggerEvent($event);
 
         if ($event->getParam('entity') && $event->getParam('entity') instanceof EntityInterface) {
             $createdEntity = $event->getParam('entity');
@@ -317,14 +317,14 @@ class Repository implements RepositoryInterface
      */
     protected function triggerDelete(EntityInterface $deletedEntity)
     {
-        $this->eventManager->addIdentifiers(get_class($deletedEntity));
+        $this->eventManager->addIdentifiers([get_class($deletedEntity)]);
 
         $event = new Event(
             sprintf('entity:%s:deleted', get_class($deletedEntity)),
             $this,
             ['entity' => $deletedEntity]
         );
-        $this->eventManager->trigger($event);
+        $this->eventManager->triggerEvent($event);
     }
 
     /**
@@ -334,9 +334,10 @@ class Repository implements RepositoryInterface
     {
         $changedEntity = $e->getChangedEntity();
 
-        $this->eventManager->addIdentifiers(get_class($changedEntity));
+        $this->eventManager->addIdentifiers([get_class($changedEntity)]);
+        $e->setName($this->getEntityChangeEventName($changedEntity));
 
-        $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity), $this, $e);
+        $this->eventManager->triggerEvent($e);
     }
 
     /**
@@ -346,9 +347,9 @@ class Repository implements RepositoryInterface
     {
         $changedEntity = $e->getChangedEntity();
 
-        $this->eventManager->addIdentifiers(get_class($changedEntity));
-
-        $this->eventManager->trigger($this->getEntityChangeEventName($changedEntity).':pre', $this, $e);
+        $this->eventManager->addIdentifiers([get_class($changedEntity)]);
+        $e->setName($this->getEntityChangeEventName($changedEntity).':pre');
+        $this->eventManager->triggerEvent($e);
     }
 
     /**
@@ -358,13 +359,14 @@ class Repository implements RepositoryInterface
     {
         $changedEntity = $e->getChangedEntity();
 
-        $this->eventManager->addIdentifiers(get_class($changedEntity));
+        $this->eventManager->addIdentifiers([get_class($changedEntity)]);
 
         $originalAttrs = $e->getOriginalEntity()->extract();
         $changedAttrs = $changedEntity->extract();
 
         foreach (array_keys(array_diff_assoc($originalAttrs, $changedAttrs)) as $attribute) {
-            $this->eventManager->trigger($this->getAttributeChangeEventName($changedEntity, $attribute), $this, $e);
+            $e->setName($this->getAttributeChangeEventName($changedEntity, $attribute));
+            $this->eventManager->triggerEvent($e);
         }
     }
 
