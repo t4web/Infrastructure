@@ -225,6 +225,18 @@ class Criteria implements CriteriaInterface
 
         return $this;
     }
+    
+    /**
+     * @param string $attribute
+     * @param array $values
+     * @return $this
+     */
+    public function notIn($attribute, array $values)
+    {
+        $this->select->where->notIn($this->getField($attribute), $values);
+
+        return $this;
+    }
 
     /**
      * @param string $attribute
