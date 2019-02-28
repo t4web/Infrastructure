@@ -268,6 +268,28 @@ class InMemoryCriteria implements CriteriaInterface
 
         return $this;
     }
+    
+    /**
+     * @param string $attribute
+     * @param array $values
+     * @return $this
+     */
+    public function notIn($attribute, array $values)
+    {
+        $this->callbacks[] = function(array $data) use ($attribute, $values) {
+            if (!array_key_exists($attribute, $data)) {
+                return false;
+            }
+
+            if (!in_array($data[$attribute], $values)) {
+                return true;
+            }
+
+            return false;
+        };
+
+        return $this;
+    }
 
     /**
      * @param string $attribute
